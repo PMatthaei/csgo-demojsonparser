@@ -34,8 +34,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxChoose = new System.Windows.Forms.TextBox();
             this.choose_demo = new System.Windows.Forms.Button();
-            this.fileDialogChoose = new System.Windows.Forms.OpenFileDialog();
             this.button_parseJSON = new System.Windows.Forms.Button();
+            this.fileDialogChoose = new System.Windows.Forms.OpenFileDialog();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -47,11 +47,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.headline.AutoSize = true;
             this.headline.Font = new System.Drawing.Font("Calibri", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.headline.Location = new System.Drawing.Point(248, 0);
+            this.headline.Location = new System.Drawing.Point(247, 0);
             this.headline.Name = "headline";
             this.headline.Size = new System.Drawing.Size(848, 75);
             this.headline.TabIndex = 0;
-            this.headline.Text = "CS:GO Encounter Detection";
+            this.headline.Text = "CS:GO-Demo to JSON Parser";
             this.headline.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // tableLayoutPanel1
@@ -62,7 +62,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.2848F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.7152F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 164F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 165F));
             this.tableLayoutPanel1.Controls.Add(this.headline, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.button_parseJSON, 1, 2);
@@ -82,7 +82,7 @@
             this.flowLayoutPanel1.Controls.Add(this.label1);
             this.flowLayoutPanel1.Controls.Add(this.textBoxChoose);
             this.flowLayoutPanel1.Controls.Add(this.choose_demo);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(248, 78);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(247, 78);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(848, 39);
             this.flowLayoutPanel1.TabIndex = 1;
@@ -114,13 +114,9 @@
             this.choose_demo.UseVisualStyleBackColor = true;
             this.choose_demo.Click += new System.EventHandler(this.choose_demo_Click);
             // 
-            // fileDialogChoose
-            // 
-            this.fileDialogChoose.FileName = "fileDialogChoose";
-            // 
             // button_parseJSON
             // 
-            this.button_parseJSON.Location = new System.Drawing.Point(248, 123);
+            this.button_parseJSON.Location = new System.Drawing.Point(247, 123);
             this.button_parseJSON.Name = "button_parseJSON";
             this.button_parseJSON.Size = new System.Drawing.Size(848, 23);
             this.button_parseJSON.TabIndex = 2;
@@ -128,13 +124,17 @@
             this.button_parseJSON.UseVisualStyleBackColor = true;
             this.button_parseJSON.Click += new System.EventHandler(this.button_parseJSON_Click);
             // 
-            // Form1
+            // fileDialogChoose
+            // 
+            this.fileDialogChoose.FileName = "fileDialogChoose";
+            // 
+            // StartView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Name = "Form1";
+            this.Name = "StartView";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.tableLayoutPanel1.ResumeLayout(false);

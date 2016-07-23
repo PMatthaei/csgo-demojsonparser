@@ -12,7 +12,7 @@ namespace CSGO_ED.src
 {
     class GameStateGenerator
     {
-        static int tickcount = 0;
+        static int tick_id = 0;
         static int stepcount = 0;
         static int hurtcount = 0;
 
@@ -31,7 +31,11 @@ namespace CSGO_ED.src
             bool hasMatchStarted = false;
             bool hasRoundStarted = false;
 
-            int roundcount = 0;
+            int round_id = 0;
+
+            int roundkills = 0;
+            Team roundwinner = Team.Spectate; //This default value whill cause errors if not correctly assigned!
+
             List<Player> ingame_players = new List<Player>(); //All players
 
             //Measure time to roughly check performance
@@ -48,7 +52,7 @@ namespace CSGO_ED.src
                 hasMatchStarted = true;
 
                 foreach (var player in parser.PlayingParticipants)
-                    jsonparser.dump(jsonparser.parsePlayer(player));
+                    jsonparser.dump(jsonparser.parsePlayerMeta(player));
 
                 ingame_players.AddRange(parser.PlayingParticipants);
             };
@@ -61,14 +65,15 @@ namespace CSGO_ED.src
             //Start writing a round object
             parser.RoundStart += (sender, e) => {
                 hasRoundStarted = true;
-                roundcount++;
-                jsonparser.dump("\"round\": {\n\t\"roundid\": \"" + roundcount + "\",\n\t\"tickrate\": \"" + parser.TickRate + "\"\n");
+                round_id++;
+                jsonparser.dump("\"round\": {\n\t\"round_id\": \"" + round_id + "\",\n\t\"tickrate\": \"" + parser.TickRate + "\"\n");
 
             };
 
             //Close round object
             parser.RoundEnd += (sender, e) => {
                 hasRoundStarted = false;
+                roundwinner = e.Winner;
                 jsonparser.dump("\n}");
             };
 
@@ -77,21 +82,25 @@ namespace CSGO_ED.src
 
 
             parser.WeaponFired += (object sender, WeaponFiredEventArgs we) => {
-                jsonparser.parseWeaponFire(we);
+                jsonparser.dump(jsonparser.parseWeaponFire(we));
             };
 
             Console.WriteLine("Registered fired weapon event");
 
             parser.PlayerKilled += (object sender, PlayerKilledEventArgs e) => {
-                //the killer is null if he`s killed by the world - eg. by falling
+                //the killer is null if vicitm is killed by the world - eg. by falling
                 if (e.Killer != null)
                 {
-                    jsonparser.parsePlayerKilled(e);
+                    jsonparser.dump(jsonparser.parsePlayerKilled(e));
                 }
             };
 
             parser.PlayerHurt += (object sender, PlayerHurtEventArgs e) => {
-                jsonparser.parsePlayerHurt(e);
+                //the attacker is null if vicitm is damaged by the world - eg. by falling
+                if (e.Attacker != null)
+                {
+                    jsonparser.dump(jsonparser.parsePlayerHurt(e));
+                }
             };
 
             Console.WriteLine("Registered killevent");
@@ -214,11 +223,11 @@ namespace CSGO_ED.src
                 // Dumb playerpositions every positioninterval-ticks
                 foreach (var player in parser.PlayingParticipants)
                 {
-                    if (tickcount % positioninterval == 0)
+                    if (tick_id % positioninterval == 0 && hasMatchStarted)
                         jsonparser.dump(jsonparser.parsePlayer(player));
                 }
 
-                tickcount++;
+                tick_id++;
 
             };
 
@@ -233,7 +242,7 @@ namespace CSGO_ED.src
             }
 
 
-            jsonparser.dump("ticks: "+tickcount);
+            jsonparser.dump("ticks: "+tick_id);
             jsonparser.stopParser();
 
 
