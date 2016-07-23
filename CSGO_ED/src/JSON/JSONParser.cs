@@ -35,12 +35,10 @@ namespace CSGO_ED.src.JSON
 
         public string parseGameMeta()
         {
-            string mapname = parseMap();
-            string tickrate = parseTickRate();
             string playersmeta = "\"players\" : [";
             foreach (var player in parser.PlayingParticipants)
                 playersmeta += parsePlayerMeta(player);
-            return mapname + ", " + tickrate + ", " + playersmeta + "]";
+            return parseMap() + ", " + parseTickRate() + ", " + playersmeta + "]";
         }
 
         public string parseGameState(DemoParser parser)
