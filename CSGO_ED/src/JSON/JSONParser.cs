@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DemoInfo;
+using Newtonsoft.Json;
 
 namespace CSGO_ED.src.JSON
 {
@@ -23,6 +24,7 @@ namespace CSGO_ED.src.JSON
 
         public void dump(string s)
         {
+            //outputStream.Write(JsonConvert.SerializeObject(s, Formatting.Indented)); //Time consuming to read and display for editors
             outputStream.Write(s);
         }
 
@@ -48,30 +50,29 @@ namespace CSGO_ED.src.JSON
 
         public string parseTick()
         {
-            return "\"tick\": { \"tick_id\": \""+parser.CurrentTick+"\", "+"\"ticktime\": \"" + parser.CurrentTime*1000.0f + "\"\n";
+            return "\"tick\": { \"tick_id\": \""+parser.CurrentTick+"\", "+"\"ticktime\": \"" + parser.CurrentTime*1000.0f + "\"";
         }
 
 
         #region Gameevents
         public string parsePlayerKilled(PlayerKilledEventArgs pke)
         {
-            return "\"player_killed\": { \"attacker\": \"" + parsePlayerDetailed(pke.Killer)+"\", " + "\"victim\": \""+parsePlayerDetailed(pke.Victim) + "\", " + "\"penetrated\": \"" + pke.PenetratedObjects + "\", " + "\"headshot\": \"" + pke.Headshot + "\"}\n";
+            return "\"player_killed\": { \"attacker\": {" + parsePlayerDetailed(pke.Killer)+"}, " + "\"victim\": {"+parsePlayerDetailed(pke.Victim) + "}, " + "\"penetrated\": \"" + pke.PenetratedObjects + "\", " + "\"headshot\": \"" + pke.Headshot + "\"}\n";
         }
-
 
         public string parseWeaponFire(WeaponFiredEventArgs we)
         {
-            return "\"weapon_fire\": { \"shooter\": \"" + parsePlayerDetailedWithEquipment(we.Shooter);
+            return "\"weapon_fire\": { \"shooter\": {" + parsePlayerDetailedWithEquipment(we.Shooter)+ "} }\n";
         }
 
         public string parsePlayerHurt(PlayerHurtEventArgs ph)
         {
-            return "\"player_hurt\": { \"attacker\": \"" + parsePlayerDetailed(ph.Attacker) + "\", " + "\"victim\": \"" + parsePlayerDetailed(ph.Player) + "\", " + "\"hitgroup\": \"" + ph.Hitgroup + "\", " + "\"HP_damage\": \"" + ph.HealthDamage + "\", "+ "\"armor_damage\": \"" + ph.ArmorDamage + "\"}\n";
+            return "\"player_hurt\": { \"attacker\": {" + parsePlayerDetailed(ph.Attacker) + "}, " + "\"victim\": {" + parsePlayerDetailed(ph.Player) + "},  " + "\"hitgroup\": \"" + ph.Hitgroup + "\", " + "\"HP_damage\": \"" + ph.HealthDamage + "\", "+ "\"armor_damage\": \"" + ph.ArmorDamage + "\"}\n";
         }
 
         public string parsePlayerFootstep(Player p)
         {
-            return "\"player_footstep\": {\n\t\"player\": "+p.EntityID +"\n\t\"position";
+            return "\"player_footstep\": {" + parsePlayer(p) + "}"; ;
         }
 
 
@@ -138,7 +139,7 @@ namespace CSGO_ED.src.JSON
 
         public string parsePlayerMeta(Player p)
         {
-            return "\"player\": { \"player_id\": \"" + p.EntityID + "\", " + "\"playername\": \""+ p.Name + ", \"team\": \"" + p.Team + "\"" + ", \"clan\": \"" + getClan(p)+ "\"\n";
+            return "\"player\": { \"player_id\": \"" + p.EntityID + "\", " + "\"playername\": \""+ p.Name + ", \"team\": \"" + p.Team + "\"" + ", \"clan\": \"" + getClan(p)+ "\"";
         }
 
         private string getClan(Player p)
@@ -153,12 +154,12 @@ namespace CSGO_ED.src.JSON
 
         public string parsePlayer(Player p)
         {
-            return "\"player\": { \"player_id\": \"" + p.EntityID + "\"" + parsePosition(p) + parseFacing(p) + "\"team\": \""+p.Team+ "\"\n";
+            return "\"player\": { \"player_id\": \"" + p.EntityID + "\", " + parsePosition(p) + ", "+ parseFacing(p) + ", \"team\": \""+p.Team+ "\"";
         }
 
         public string parsePlayerDetailed(Player p)
         {
-            return parsePlayer(p) + "\"HP\": \""+p.HP+"\"" + "\"Armor\": \"" + p.Armor + "\"" + "\"HasHelmet\": \"" + p.HasHelmet + "\"" + "\"HasDefuser\": \"" + p.HasDefuseKit + "\"" + "\"IsDucking\": \"" + p.IsDucking + "\"\n";
+            return parsePlayer(p) + ", \"HP\": \""+p.HP+"\", " + "\"Armor\": \"" + p.Armor + "\", " + "\"HasHelmet\": \"" + p.HasHelmet + "\", " + "\"HasDefuser\": \"" + p.HasDefuseKit + "\", " + "\"IsDucking\": \"" + p.IsDucking + "\"}";
         }
 
         public string parsePlayerDetailedWithEquipment(Player p)
@@ -168,12 +169,12 @@ namespace CSGO_ED.src.JSON
 
         public string parsePosition(Player player)
         {
-            return "\"position\": { \"x:\" \"" + player.Position.X + "\"," + "\"y:\" \"" + player.Position.Y + "\",t" + "\"z:\" \"" + player.Position.Z + "\"}";
+            return "\"position\": { \"x\": \"" + player.Position.X + "\", " + "\"y\": \"" + player.Position.Y + "\", " + "\"z:\" \"" + player.Position.Z + "\"}";
         }
 
         public string parseFacing(Player player)
         {
-            return " \"facing\": { \"pitch:\" \"" + player.ViewDirectionY + "\", " + "\"yaw:\" \"" + player.ViewDirectionY + "\"}";
+            return " \"facing\": { \"pitch\": \"" + player.ViewDirectionY + "\", " + "\"yaw\": \"" + player.ViewDirectionY + "\"}";
         }
 
         public string parseEntity(Player player)
@@ -186,7 +187,7 @@ namespace CSGO_ED.src.JSON
             string s = "";
 
             foreach(var wp in wps){
-                s += parseWeapon(wp)+"\n";
+                s += parseWeapon(wp);
             }
 
             return s;
