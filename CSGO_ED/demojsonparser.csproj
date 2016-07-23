@@ -7,8 +7,8 @@
     <ProjectGuid>{1F5E5C98-A49A-4927-87B0-4931B77C7DAD}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CSGO_ED</RootNamespace>
-    <AssemblyName>CSGO_ED</AssemblyName>
+    <RootNamespace>demojsonparser</RootNamespace>
+    <AssemblyName>demojsonparser</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -72,6 +72,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="views\StartView.resx">
       <DependentUpon>StartView.cs</DependentUpon>
