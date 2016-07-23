@@ -7,14 +7,13 @@ using System.Reflection;
 using System.IO;
 using CSGO_ED.src.JSON;
 using DemoInfo;
+using Newtonsoft.Json;
 
 namespace CSGO_ED.src
 {
     class GameStateGenerator
     {
         static int tick_id = 0;
-        static int stepcount = 0;
-        static int hurtcount = 0;
 
         const int positioninterval = 8;
 
@@ -28,7 +27,8 @@ namespace CSGO_ED.src
             string jsonstring = "";
 
             //Variables
-            bool hasMatchStarted = false;
+            //Use this to differntiate between warmup(maybe even knife rounds in official matches) rounds and real "counting" rounds
+            bool hasMatchStarted = false; 
             bool hasRoundStarted = false;
 
             int round_id = 0;
@@ -44,37 +44,46 @@ namespace CSGO_ED.src
             //Obligatory to use this parser
             parser.ParseHeader();
 
-            //Write the gamestate object
-            jsonparser.dump("\"gamestate\": {\n\t\"map\": \"" + parser.Map + "\",\n\t\"tickrate\": \"" + parser.TickRate + "\"\n}\n");
+
             
-            //Start writing the match object
+            
+            //Start writing the gamestate object
             parser.MatchStarted += (sender, e) => {
                 hasMatchStarted = true;
 
-                foreach (var player in parser.PlayingParticipants)
-                    jsonparser.dump(jsonparser.parsePlayerMeta(player));
+                //Write the gamestate object with its meta data about the game
+                jsonparser.dump("\"gamestate\": { " + jsonparser.parseGameMeta() + "}");
 
-                ingame_players.AddRange(parser.PlayingParticipants);
+                //jsonparser.dump(" \n\n\n\n\n MATCH STARTED \n\n\n\n\n");
             };
 
             //Close gamestate object
             parser.WinPanelMatch += (sender, e) => {
-                jsonparser.dump("\n}");
+                if (hasMatchStarted)
+                    jsonparser.dump("\n}");
+                    hasMatchStarted = false;
             };
 
             //Start writing a round object
             parser.RoundStart += (sender, e) => {
-                hasRoundStarted = true;
-                round_id++;
-                jsonparser.dump("\"round\": {\n\t\"round_id\": \"" + round_id + "\",\n\t\"tickrate\": \"" + parser.TickRate + "\"\n");
+                if (hasMatchStarted)
+                {
+                    hasRoundStarted = true;
+                    round_id++;
+                    jsonparser.dump("\"round\": {\n\t\"round_id\": \"" + round_id + "\",\n\t\"tickrate\": \"" + parser.TickRate + "\"\n");
+                }
 
             };
 
             //Close round object
             parser.RoundEnd += (sender, e) => {
-                hasRoundStarted = false;
-                roundwinner = e.Winner;
-                jsonparser.dump("\n}");
+                if (hasMatchStarted)
+                {
+                    hasRoundStarted = false;
+                    roundwinner = e.Winner;
+                    jsonparser.dump("\n}");
+                }
+
             };
 
 
@@ -82,150 +91,139 @@ namespace CSGO_ED.src
 
 
             parser.WeaponFired += (object sender, WeaponFiredEventArgs we) => {
-                jsonparser.dump(jsonparser.parseWeaponFire(we));
+                if (hasMatchStarted)
+                    jsonparser.dump(jsonparser.parseWeaponFire(we));
             };
 
-            Console.WriteLine("Registered fired weapon event");
 
             parser.PlayerKilled += (object sender, PlayerKilledEventArgs e) => {
-                //the killer is null if vicitm is killed by the world - eg. by falling
-                if (e.Killer != null)
-                {
-                    jsonparser.dump(jsonparser.parsePlayerKilled(e));
-                }
+                if (hasMatchStarted)
+                    //the killer is null if vicitm is killed by the world - eg. by falling
+                    if (e.Killer != null)
+                    {
+                        jsonparser.dump(jsonparser.parsePlayerKilled(e));
+                    }
             };
 
             parser.PlayerHurt += (object sender, PlayerHurtEventArgs e) => {
-                //the attacker is null if vicitm is damaged by the world - eg. by falling
-                if (e.Attacker != null)
-                {
-                    jsonparser.dump(jsonparser.parsePlayerHurt(e));
-                }
+                if (hasMatchStarted)
+                    //the attacker is null if vicitm is damaged by the world - eg. by falling
+                    if (e.Attacker != null)
+                    {
+                        jsonparser.dump(jsonparser.parsePlayerHurt(e));
+                    }
             };
-
-            Console.WriteLine("Registered killevent");
 
             //Nade (Smoke Fire Decoy Flashbang and HE) events
             parser.ExplosiveNadeExploded += (object sender, GrenadeEventArgs e) => {
-                if (e.ThrownBy != null)
+                if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    string name = e.ThrownBy.EntityID.ToString();
-                    string entityid = e.ThrownBy.EntityID.ToString();
-                    string position = e.ThrownBy.Position.ToString();
-                    string facingX = e.ThrownBy.ViewDirectionX.ToString();
-                    string facingY = e.ThrownBy.ViewDirectionY.ToString();
-                    string nadeposition = e.Position.ToString();
-                    jsonstring += "nade_exploded:{ player: " + name + " facing: " + facingX + ", " + facingY + "positon:" + position + " nade_position: " + nadeposition + "}\n";
+                    jsonparser.dump(jsonparser.parseHegrenadeDetonated(e));
                 }
             };
 
             parser.FireNadeStarted += (object sender, FireEventArgs e) => {
-                string nadeposition = e.Position.ToString();
-                jsonstring += "firenade_started:{ nade_position: " + nadeposition + "}\n";
+                if (e.ThrownBy != null && hasMatchStarted)
+                {
+                    jsonparser.dump(jsonparser.parseFiregrenadeDetonated(e));
+                }
             };
 
             parser.FireNadeEnded += (object sender, FireEventArgs e) => {
-                string nadeposition = e.Position.ToString();
-                jsonstring += "firenade_ended:{ nade_position: " + nadeposition + "}\n";
+                if (e.ThrownBy != null && hasMatchStarted)
+                {
+                    jsonparser.dump(jsonparser.parseFiregrenadeEnded(e));
+                }
             };
 
             parser.SmokeNadeStarted += (object sender, SmokeEventArgs e) => {
-                string name = e.ThrownBy.EntityID.ToString();
-                string entityid = e.ThrownBy.EntityID.ToString();
-                string position = e.ThrownBy.Position.ToString();
-                string facingX = e.ThrownBy.ViewDirectionX.ToString();
-                string facingY = e.ThrownBy.ViewDirectionY.ToString();
-                string nadeposition = e.Position.ToString();
-                jsonstring += "smokenade_started:{ player: " + name + " facing: " + facingX + ", " + facingY + "positon:" + position + " nade_position: " + nadeposition + "}\n";
+                if (e.ThrownBy != null && hasMatchStarted)
+                {
+                    jsonparser.dump(jsonparser.parseSmokegrenadeDetonated(e));
+                }
             };
 
 
             parser.SmokeNadeEnded += (object sender, SmokeEventArgs e) => {
-                string name = e.ThrownBy.EntityID.ToString();
-                string entityid = e.ThrownBy.EntityID.ToString();
-                string position = e.ThrownBy.Position.ToString();
-                string facingX = e.ThrownBy.ViewDirectionX.ToString();
-                string facingY = e.ThrownBy.ViewDirectionY.ToString();
-                string nadeposition = e.Position.ToString();
-                jsonstring += "smokenade_ended:{ player: " + name + " facing: " + facingX + ", " + facingY + "positon:" + position + " nade_position: " + nadeposition + "}\n";
+                if (e.ThrownBy != null && hasMatchStarted)
+                {
+                    jsonparser.dump(jsonparser.parseSmokegrenadeEnded(e));
+                }
             };
 
             parser.DecoyNadeStarted += (object sender, DecoyEventArgs e) => {
-                string name = e.ThrownBy.EntityID.ToString();
-                string entityid = e.ThrownBy.EntityID.ToString();
-                string position = e.ThrownBy.Position.ToString();
-                string facingX = e.ThrownBy.ViewDirectionX.ToString();
-                string facingY = e.ThrownBy.ViewDirectionY.ToString();
-                string nadeposition = e.Position.ToString();
-                jsonstring += "decoynade_ended:{ player: " + name + " facing: " + facingX + ", " + facingY + "positon:" + position + " nade_position: " + nadeposition + "}\n";
+                if (e.ThrownBy != null && hasMatchStarted)
+                {
+                    jsonparser.dump(jsonparser.parseDecoyDetonated(e));
+                }
             };
 
             parser.DecoyNadeEnded += (object sender, DecoyEventArgs e) => {
-                string name = e.ThrownBy.EntityID.ToString();
-                string entityid = e.ThrownBy.EntityID.ToString();
-                string position = e.ThrownBy.Position.ToString();
-                string facingX = e.ThrownBy.ViewDirectionX.ToString();
-                string facingY = e.ThrownBy.ViewDirectionY.ToString();
-                string nadeposition = e.Position.ToString();
-                jsonstring += "decoynade_ended:{ player: " + name + " facing: " + facingX + ", " + facingY + "positon:" + position + " nade_position: " + nadeposition + "}\n";
-            };
-
-            parser.NadeReachedTarget += (object sender, NadeEventArgs e) => {
-                string nadeposition = e.Position.ToString();
-                jsonstring += "nade_reachedtarget:{ nade_position: " + nadeposition + "}\n";
+                if (e.ThrownBy != null && hasMatchStarted)
+                {
+                    jsonparser.dump(jsonparser.parseDecoyEnded(e));
+                }
             };
 
             parser.FlashNadeExploded += (object sender, FlashEventArgs e) => {
-                string name = e.ThrownBy.EntityID.ToString();
-                string entityid = e.ThrownBy.EntityID.ToString();
-                string position = e.ThrownBy.Position.ToString();
-                string facingX = e.ThrownBy.ViewDirectionX.ToString();
-                string facingY = e.ThrownBy.ViewDirectionY.ToString();
-                string nadeposition = e.Position.ToString();
-                jsonstring += "flashnade_exploded:{ player: " + name + " facing: " + facingX + ", " + facingY + "positon:" + position + " nade_position: " + nadeposition + "}\n";
+                if (e.ThrownBy != null && hasMatchStarted)
+                {
+                    jsonparser.dump(jsonparser.parseFlashbangDetonated(e));
+                }
             };
 
-
-            parser.BombAbortDefuse += (sender, e) => {
-
+            parser.NadeReachedTarget += (object sender, NadeEventArgs e) => {
+                if (e.ThrownBy != null && hasMatchStarted)
+                {
+                    jsonparser.dump(jsonparser.parseNadeReachedTarget(e));
+                }
             };
+
 
             parser.BombAbortPlant += (sender, e) => {
-
+                jsonparser.dump(jsonparser.parseBombAbortPlant(e));
             };
 
-            parser.BombBeginDefuse += (sender, e) => {
-
+            parser.BombAbortDefuse += (sender, e) => {
+                jsonparser.dump(jsonparser.parseBombAbortDefuse(e));
             };
 
             parser.BombBeginPlant += (sender, e) => {
-
+                jsonparser.dump(jsonparser.parseBombBeginPlant(e));
             };
 
-            parser.BombDefused += (sender, e) => {
-
-            };
-
-            parser.BombExploded += (sender, e) => {
-
+            parser.BombBeginDefuse += (sender, e) => {
+                jsonparser.dump(jsonparser.parseBombBeginDefuse(e));
             };
 
             parser.BombPlanted += (sender, e) => {
-
+                jsonparser.dump(jsonparser.parseBombPlanted(e));
             };
+
+            parser.BombDefused += (sender, e) => {
+                jsonparser.dump(jsonparser.parseBombDefused(e));
+            };
+
+
+            parser.BombExploded += (sender, e) => {
+                jsonparser.dump(jsonparser.parseBombExploded(e));
+            };
+
+
 
             //Open a tick object
             parser.TickDone += (sender, e) => {
+                if (!hasMatchStarted) //Dont count ticks if the game has not started already (dismissing warmup and knife-phase for official matches)
+                    return;
                 // Every tick save id and time
-                //jsonstring += "tick: { id: " + parser.CurrentTick + "}\n";
-                jsonparser.dump(jsonparser.parseTick());
+                jsonparser.dump(jsonparser.parseTick() + "}\n");
 
                 // Dumb playerpositions every positioninterval-ticks
-                foreach (var player in parser.PlayingParticipants)
-                {
-                    if (tick_id % positioninterval == 0 && hasMatchStarted)
-                        jsonparser.dump(jsonparser.parsePlayer(player));
-                }
+                if (tick_id % positioninterval == 0 )
+                    foreach (var player in parser.PlayingParticipants)
+                    {
+                        jsonparser.dump(jsonparser.parsePlayerFootstep(player));
+                    }
 
                 tick_id++;
 
@@ -238,13 +236,14 @@ namespace CSGO_ED.src
                 hasnext = parser.ParseNextTick();
                 jsonparser.dump(jsonstring);
                 jsonstring = "";
-                jsonparser.dump("}\n");
+                //if (hasMatchStarted) //When match has started close every tick object
+                    //jsonparser.dump("}\n");
             }
 
 
             jsonparser.dump("ticks: "+tick_id);
-            jsonparser.stopParser();
 
+            jsonparser.stopParser();
 
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;

@@ -33,6 +33,16 @@ namespace CSGO_ED.src.JSON
             outputStream.Close();
         }
 
+        public string parseGameMeta()
+        {
+            string mapname = parseMap();
+            string tickrate = parseTickRate();
+            string playersmeta = "\"players\" : [";
+            foreach (var player in parser.PlayingParticipants)
+                playersmeta += parsePlayerMeta(player);
+            return mapname + ", " + tickrate + ", " + playersmeta + "]";
+        }
+
         public string parseGameState(DemoParser parser)
         {
             return "\"gamestate\": { map: " + parser.Map + "},  { tickrate: " + parser.TickRate + "}\n";
@@ -76,11 +86,11 @@ namespace CSGO_ED.src.JSON
         }
 
 
+        #region NADES
         public string parseHegrenadeDetonated(GrenadeEventArgs he)
         {
             return "\"hegrenade_detonated\": ";
         }
-
 
         public string parseFlashbangDetonated(FlashEventArgs fbe)
         {
@@ -116,6 +126,51 @@ namespace CSGO_ED.src.JSON
         {
             return "\"decoy_ended\": ";
         }
+
+        public string parseNadeReachedTarget(NadeEventArgs ne)
+        {
+            return "\"decoy_ended\": ";
+        }
+        #endregion
+
+        #region Bombevents
+        public string parseBombExploded(BombEventArgs ne)
+        {
+            return "\"bomb_exploded\"";
+        }
+
+
+        public string parseBombPlanted(BombEventArgs ne)
+        {
+            return "\"bomb_planted\"";
+        }
+
+        public string parseBombDefused(BombEventArgs ne) //No bombdefuseeevent??
+        {
+            return "\"bomb_defused\"";
+        }
+
+        public string parseBombAbortPlant(BombEventArgs ne)
+        {
+            return "\"bomb_abortplant\"";
+        }
+
+        public string parseBombAbortDefuse(BombDefuseEventArgs ne)
+        {
+            return "\"bomb_abortdefuse\"";
+        }
+
+        public string parseBombBeginPlant(BombEventArgs ne)
+        {
+            return "\"bomb_beginplant\"";
+        }
+
+        public string parseBombBeginDefuse(BombDefuseEventArgs ne)
+        {
+            return "\"bomb_begindefuse\"";
+        }
+        #endregion
+
         #endregion
 
 
@@ -127,19 +182,19 @@ namespace CSGO_ED.src.JSON
 
         #region SUBEVENTS
 
-        public string parseMap(string mapname)
+        public string parseMap()
         {
-            return "\"mapname\": \"" + mapname + "\"";
+            return "\"mapname\": \"" + parser.Map + "\"";
         }
 
-        public string parseTickRate(string tr)
+        public string parseTickRate()
         {
-            return "\"tickrate\": \"" + tr + "\"";
+            return "\"tickrate\": \"" + parser.TickRate + "\"";
         }
 
         public string parsePlayerMeta(Player p)
         {
-            return "\"player\": { \"player_id\": \"" + p.EntityID + "\", " + "\"playername\": \""+ p.Name + ", \"team\": \"" + p.Team + "\"" + ", \"clan\": \"" + getClan(p)+ "\"";
+            return "\"player\": { \"player_id\": \"" + p.EntityID + "\", " + "\"playername\": \""+ p.Name + "\", \"team\": \"" + p.Team + "\"" + ", \"clan\": \"" + getClan(p)+ "\"}";
         }
 
         private string getClan(Player p)
