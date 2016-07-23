@@ -1,6 +1,6 @@
 # Demojsonparser
 
-This is a JSONParser using the following format : <coming soon>
+This is a JSONParser using the following format : coming soon
 
 Data about the CS:GO demos is parsed and provided by:
 
