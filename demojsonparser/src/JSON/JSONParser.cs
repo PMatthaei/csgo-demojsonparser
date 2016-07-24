@@ -136,12 +136,11 @@ namespace CSGO_ED.src.JSON
         }
         #endregion
 
-        private string parseBomb(BombEventArgs be)
+        private string parseBomb(BombEventArgs be) //TODO: maybe detailed player info? see bombdefuse
         {
             return "\"site:\" \"" + be.Site + "\", "+ "\"player:\" \"" + be.Player.EntityID + "\"";
         }
 
-        //more info about player than entityid? maybe detailed to tell what he got (life, armor, weapons)
         private string parseBombDefuse(BombDefuseEventArgs bde)
         {
             return "\"player:\" \"" + bde.Player.EntityID + "\", " + "\"haskit:\" \"" + bde.HasKit + "\"";

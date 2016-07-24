@@ -114,6 +114,7 @@ namespace CSGO_ED.src
                     }
             };
 
+            #region Nadeevents
             //Nade (Smoke Fire Decoy Flashbang and HE) events
             parser.ExplosiveNadeExploded += (object sender, GrenadeEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
@@ -178,38 +179,53 @@ namespace CSGO_ED.src
                     jsonparser.dump(jsonparser.parseNadeReachedTarget(e));
                 }
             };
+            #endregion
 
-
-            parser.BombAbortPlant += (sender, e) => {
+            #region Bombevents
+            parser.BombAbortPlant += (object sender, BombEventArgs e) => {
                 jsonparser.dump(jsonparser.parseBombAbortPlant(e));
             };
 
-            parser.BombAbortDefuse += (sender, e) => {
+            parser.BombAbortDefuse += (object sender, BombDefuseEventArgs e) => {
                 jsonparser.dump(jsonparser.parseBombAbortDefuse(e));
             };
 
-            parser.BombBeginPlant += (sender, e) => {
+            parser.BombBeginPlant += (object sender, BombEventArgs e) => {
                 jsonparser.dump(jsonparser.parseBombBeginPlant(e));
             };
 
-            parser.BombBeginDefuse += (sender, e) => {
+            parser.BombBeginDefuse += (object sender, BombDefuseEventArgs e) => {
                 jsonparser.dump(jsonparser.parseBombBeginDefuse(e));
             };
 
-            parser.BombPlanted += (sender, e) => {
+            parser.BombPlanted += (object sender, BombEventArgs e) => {
                 jsonparser.dump(jsonparser.parseBombPlanted(e));
             };
 
-            parser.BombDefused += (sender, e) => {
+            parser.BombDefused += (object sender, BombEventArgs e) => {
                 jsonparser.dump(jsonparser.parseBombDefused(e));
             };
 
-
-            parser.BombExploded += (sender, e) => {
+            parser.BombExploded += (object sender, BombEventArgs e) => {
                 jsonparser.dump(jsonparser.parseBombExploded(e));
             };
+            #endregion
 
+            /*
+            //Extraevents maybe useful
+            parser.RoundFinal += (object sender, RoundFinalEventArgs e) => {
+                
+            };
+            parser.RoundMVP += (object sender, RoundMVPEventArgs e) => {
+                
+            };
+            parser.RoundOfficiallyEnd += (object sender, RoundOfficiallyEndedEventArgs e) => {
 
+            };
+            parser.LastRoundHalf += (object sender, LastRoundHalfEventArgs e) => {
+
+            };
+            */
 
             //Open a tick object
             parser.TickDone += (sender, e) => {
