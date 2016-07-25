@@ -27,14 +27,21 @@ namespace CSGO_ED
 
         private void choose_demo_Click(object sender, EventArgs e)
         {
+            fileDialogChoose.Multiselect = true;
+            fileDialogChoose.Filter = "CS:GO Demo File|*.dem";
+
             if (fileDialogChoose.ShowDialog() == DialogResult.OK)
-                textBoxChoose.Text = fileDialogChoose.FileName;
+                textBoxChoose.Text = String.Join("", fileDialogChoose.FileNames);
         }
 
         private void button_parseJSON_Click(object sender, EventArgs e)
         {
-            var demoparser = new DemoParser(File.OpenRead(textBoxChoose.Text));
-            GameStateGenerator.GenerateJSONFile(demoparser, textBoxChoose.Text);
+            foreach(string path in fileDialogChoose.FileNames)
+            {
+                var demoparser = new DemoParser(File.OpenRead(path));
+                GameStateGenerator.GenerateJSONFile(demoparser, textBoxChoose.Text);
+            }
+            
         }
     }
 }
