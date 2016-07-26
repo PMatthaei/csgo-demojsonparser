@@ -98,11 +98,15 @@ namespace CSGO_ED.src
 
             parser.PlayerKilled += (object sender, PlayerKilledEventArgs e) => {
                 if (hasMatchStarted)
+                {
+                    roundkills++;
                     //the killer is null if vicitm is killed by the world - eg. by falling
                     if (e.Killer != null)
                     {
                         jsonparser.dump(jsonparser.parsePlayerKilled(e));
                     }
+                }
+
             };
 
             parser.PlayerHurt += (object sender, PlayerHurtEventArgs e) => {

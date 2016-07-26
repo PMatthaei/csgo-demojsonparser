@@ -38,8 +38,10 @@ namespace CSGO_ED
         {
             foreach(string path in fileDialogChoose.FileNames)
             {
-                var demoparser = new DemoParser(File.OpenRead(path));
-                GameStateGenerator.GenerateJSONFile(demoparser, textBoxChoose.Text);
+                using (var demoparser = new DemoParser(File.OpenRead(path))) //Force garbage collection since outputstream of the parser cannot be changed
+                {
+                    GameStateGenerator.GenerateJSONFile(demoparser,path);
+                }
             }
             
         }
