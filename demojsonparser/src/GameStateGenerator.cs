@@ -37,8 +37,9 @@ namespace GameStateGenerator.src
             
             //Variables
             //Use this to differentiate between warmup(maybe even knife rounds in official matches) rounds and real "counting" rounds
-            bool hasMatchStarted = false; 
+            bool hasMatchStarted = false;
             bool hasRoundStarted = false;
+            bool hasFreeezEnded = false;
 
             int round_id = 0;
 
@@ -257,6 +258,9 @@ namespace GameStateGenerator.src
 
             };
             */
+            parser.FreezetimeEnded += (object sender, FreezetimeEndedEventArgs e) => {
+                hasFreeezEnded = true; //Neglect movement(later used) when freezetime is active
+            };
 
             //Open a tick object
             parser.TickDone += (sender, e) => {
@@ -264,7 +268,7 @@ namespace GameStateGenerator.src
                     return;
                 // Every tick save id and time
                 // Dumb playerpositions every positioninterval-ticks
-                if (tick_id % positioninterval == 0 )
+                if ((tick_id % positioninterval == 0) && hasFreeezEnded)
                     foreach (var player in parser.PlayingParticipants)
                     {
                         tick.tickevents.Add(jsonparser.assemblePlayerFootstep(player));
@@ -300,10 +304,5 @@ namespace GameStateGenerator.src
             Console.Write("Time(in Seconds): " + sec + "\n");
         }
 
-
-        public static void GenerateTick(DemoParser parser)
-        {
-
-        }
     }
 }

@@ -8,6 +8,10 @@ namespace GameStateGenerator
 {
     static class Program
     {
+        /*static void Main(string[] args)
+        {
+            Console.WriteLine("Hi");
+        }*/
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
