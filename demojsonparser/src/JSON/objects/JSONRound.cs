@@ -9,6 +9,7 @@ namespace demojsonparser.src.JSON.objects
     class JSONRound
     {
         public int round_id { get; set; }
+        public string winner { get; set; }
         public List<JSONTick> ticks { get; set; }
 
     }

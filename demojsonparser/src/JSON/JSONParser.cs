@@ -56,6 +56,7 @@ namespace GameStateGenerator.src.JSON
         {
             return new JSONPlayerKilled
             {
+                gameevent = "player_killed",
                 attacker = assemblePlayerDetailed(pke.Killer),
                 victim = assemblePlayerDetailed(pke.Killer),
                 headhshot = pke.Headshot,
@@ -69,6 +70,7 @@ namespace GameStateGenerator.src.JSON
         {
             return new JSONWeaponFire
             {
+                gameevent = "weapon_fire",
                 shooter = assemblePlayerDetailed(we.Shooter),
                 weapon = assembleWeapon(we.Weapon)
             };
@@ -78,6 +80,7 @@ namespace GameStateGenerator.src.JSON
         {
             JSONPlayerHurt ph = new JSONPlayerHurt
             {
+                gameevent = "player_hurt",
                 attacker = assemblePlayer(phe.Attacker),
                 victim = assemblePlayer(phe.Player),
                 armor = phe.Armor,
@@ -94,10 +97,12 @@ namespace GameStateGenerator.src.JSON
         {
             return new JSONPlayerFootstep
             {
+                gameevent = "player_footstep",
                 player = assemblePlayer(p)
             };
         }
 
+        #region Nades
         public string parseNade(EquipmentElement nadetype, Player thrownby, Vector position, Player[] ps)
         {
             JSONNades nd = assembleNade(nadetype, thrownby, position, ps);
@@ -115,58 +120,65 @@ namespace GameStateGenerator.src.JSON
             };
         }
 
-        #region NADES
-        public string parseHegrenadeDetonated(GrenadeEventArgs he)
+        public JSONNades assembleHEGrenade(GrenadeEventArgs he)
         {
-            return "\"hegrenade_detonated\": { " + parseNade(he.NadeType, he.ThrownBy, he.Position, null) + "}";
+            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
+            n.gameevent = "hegrenade_detonated";
+            return n;
         }
 
-        public string parseFlashbangDetonated(FlashEventArgs fbe)
+        public JSONNades assembleSmokegrenade(SmokeEventArgs he)
         {
-            return "\"flashbang_detonated\": {" + parseNade(fbe.NadeType, fbe.ThrownBy, fbe.Position, fbe.FlashedPlayers);
+            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
+            n.gameevent = "smokegrenade_detonated";
+            return n;
         }
 
-        public string parseSmokegrenadeDetonated(SmokeEventArgs se)
+        public JSONNades assembleFiregrenade(FireEventArgs he)
         {
-            return "\"smokegrenade_detonated\": {" + parseNade(se.NadeType, se.ThrownBy, se.Position, null) + "}";
+            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
+            n.gameevent = "firegrenade_detonated";
+            return n;
         }
 
-        public string parseFiregrenadeDetonated(FireEventArgs fe)
+        public JSONNades assembleFlashbang(FlashEventArgs he)
         {
-            return "\"firegrenade_detonated\": {" + parseNade(fe.NadeType, fe.ThrownBy, fe.Position, null) + "}";
+            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, he.FlashedPlayers);
+            n.gameevent = "flashbang_detonated";
+            return n;
         }
 
-        public string parseDecoyDetonated(DecoyEventArgs de)
+        public JSONNades assembleDecoy(DecoyEventArgs he)
         {
-            return "\"decoy_detonated\": {" + parseNade(de.NadeType, de.ThrownBy, de.Position, null) + "}";
+            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
+            n.gameevent = "decoy_detonated";
+            return n;
         }
 
-        public string parseFiregrenadeEnded(FireEventArgs fe)
+
+        public JSONNades assembleFiregrenadeEnded(FireEventArgs he)
         {
-            return "\"firegrenade_ended\": {" + parseNade(fe.NadeType, fe.ThrownBy, fe.Position, null) + "}";
+            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
+            n.gameevent = "firegrenade_ended";
+            return n;
         }
 
-        public string parseSmokegrenadeEnded(SmokeEventArgs se)
+        public JSONNades assembleSmokegrenadeEnded(SmokeEventArgs he)
         {
-            return "\"smokegrenade_ended\": {" + parseNade(se.NadeType, se.ThrownBy, se.Position, null) + "}";
+            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
+            n.gameevent = "flashbang_ended";
+            return n;
         }
 
-        public string parseDecoyEnded(DecoyEventArgs de)
+        public JSONNades assembleDecoyEnded(DecoyEventArgs he)
         {
-            return "\"decoy_ended\":  {" + parseNade(de.NadeType, de.ThrownBy, de.Position, null) +  "}";
-        }
-
-        public string parseNadeReachedTarget(NadeEventArgs ne)
-        {
-            return "\"decoy_ended\":  {" + parseNade(ne.NadeType, ne.ThrownBy, ne.Position, null) + "}";
+            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
+            n.gameevent = "decoy_ended";
+            return n;
         }
         #endregion
 
-        private string parseBomb(BombEventArgs be)
-        {
-            JSONBomb b = assembleBomb(be);
-            return JsonConvert.SerializeObject(b, Formatting.Indented);
-        }
+        #region Bombevents
 
         public JSONBomb assembleBomb(BombEventArgs be)
         {
@@ -177,12 +189,6 @@ namespace GameStateGenerator.src.JSON
             };
         }
 
-        private string parseBombDefuse(BombDefuseEventArgs bde)
-        {
-            JSONBomb b = assembleBombDefuse(bde);
-            return JsonConvert.SerializeObject(b, Formatting.Indented);
-        }
-
         public JSONBomb assembleBombDefuse(BombDefuseEventArgs bde)
         {
             return new JSONBomb
@@ -191,67 +197,14 @@ namespace GameStateGenerator.src.JSON
                 player = assemblePlayer(bde.Player)
             };
         }
-
-        #region Bombevents
-        public string parseBombExploded(BombEventArgs be)
-        {
-            return "\"bomb_exploded\": {" + parseBomb(be);
-        }
-
-
-        public string parseBombPlanted(BombEventArgs be)
-        {
-            return "\"bomb_planted\": {" + parseBomb(be);
-        }
-
-        public string parseBombDefused(BombEventArgs be) //No bombdefuseeevent??
-        {
-            return "\"bomb_defused\": {" + parseBomb(be);
-        }
-
-        public string parseBombAbortPlant(BombEventArgs be)
-        {
-            return "\"bomb_abortplant\": {" + parseBomb(be);
-        }
-
-        public string parseBombAbortDefuse(BombDefuseEventArgs be)
-        {
-            return "\"bomb_abortdefuse\": {" + parseBombDefuse(be);
-        }
-
-        public string parseBombBeginPlant(BombEventArgs be)
-        {
-            return "\"bomb_beginplant\": {" + parseBomb(be);
-        }
-
-        public string parseBombBeginDefuse(BombDefuseEventArgs be)
-        {
-            return "\"bomb_begindefuse\": {" + parseBombDefuse(be);
-        }
         #endregion
 
         #endregion
 
 
-
-        public string createBrackets(string s)
-        {
-            return "{" + s + "}";
-        }
 
         #region SUBEVENTS
         
-        private string getClan(Player p)
-        {
-            switch (p.Team)
-            {
-                case Team.CounterTerrorist : return parser.CTClanName;
-                case Team.Terrorist : return parser.TClanName;
-                default: return "NOCLAN";
-            }
-        }
-
-
         public List<JSONPlayer> assemblePlayers(Player[] ps)
         {
             if (ps == null)

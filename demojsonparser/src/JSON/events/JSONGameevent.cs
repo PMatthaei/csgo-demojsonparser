@@ -8,5 +8,6 @@ namespace demojsonparser.src.JSON.events
 {
     class JSONGameevent
     {
+        public string gameevent { get; set; }
     }
 }
