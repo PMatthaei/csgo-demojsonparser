@@ -8,7 +8,7 @@ using demojsonparser.src.JSON.objects.subobjects;
 
 namespace demojsonparser.src.JSON.events
 {
-    class JSONNades
+    class JSONNades : JSONGameevent
     {
         public string nadetype { get; set; }
         public JSONPlayer thrownby { get; set; }

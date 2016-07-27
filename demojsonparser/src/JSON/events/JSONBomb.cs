@@ -7,7 +7,7 @@ using demojsonparser.src.JSON.objects;
 
 namespace demojsonparser.src.JSON.events
 {
-    class JSONBombEvents
+    class JSONBomb : JSONGameevent
     {
         public char site { get; set; }
         public JSONPlayer player { get; set; }

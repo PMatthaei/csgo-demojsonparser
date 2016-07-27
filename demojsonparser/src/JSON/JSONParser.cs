@@ -10,13 +10,15 @@ using demojsonparser.src.JSON.objects;
 using demojsonparser.src.JSON.events;
 using demojsonparser.src.JSON.objects.subobjects;
 
-namespace CSGO_ED.src.JSON
+namespace GameStateGenerator.src.JSON
 {
     class JSONParser
     {
 
         StreamWriter outputStream;
         DemoParser parser;
+
+        enum PlayerType {META, NORMAL, DETAILED, WITHEQUIPMENT };
 
         public JSONParser(DemoParser parser, string path)
         {
@@ -25,9 +27,9 @@ namespace CSGO_ED.src.JSON
             outputStream = new StreamWriter(outputpath);
         }
 
-        public void dump(string s)
+        public void dump(JSONGamestate gs)
         {
-            outputStream.Write(s);
+            outputStream.Write(JsonConvert.SerializeObject(gs, Formatting.Indented));
         }
 
         public void stopParser()
@@ -35,40 +37,24 @@ namespace CSGO_ED.src.JSON
             outputStream.Close();
         }
 
-        public string parseGameMeta()
-        {
-            string playersmeta = "\"players\" : [";
-            foreach (var player in parser.PlayingParticipants)
-                playersmeta += parsePlayerMeta(player);
-            return parseMap() + ", " + parseTickRate() + ", " + playersmeta + "]";
-        }
 
-        public string parseGameState(DemoParser parser)
+        public JSONGamemeta assembleGamemeta()
         {
-            return "\"gamestate\": { map: " + parser.Map + "},  { tickrate: " + parser.TickRate + "}\n";
-        }
-
-        public string parseMatch()
-        {
-            return "\"match\": ";
-        }
-
-        public string parseRound()
-        {
-            return "\"round\": ";
-        }
-
-        public string parseTick()
-        {
-            //ticktime in milliseconds
-            return "\"tick\": { \"tick_id\": \""+parser.CurrentTick+"\", "+"\"ticktime\": \"" + parser.CurrentTime*1000.0f + "\"";
+            return new JSONGamemeta
+            {
+                gamestate_id = 0,
+                mapname = parser.Map,
+                tickrate = parser.TickRate,
+                players = assemblePlayers(parser.PlayingParticipants),
+            };
         }
 
 
         #region Gameevents
-        public string parsePlayerKilled(PlayerKilledEventArgs pke)
+
+        public JSONPlayerKilled assemblePlayerKilled(PlayerKilledEventArgs pke)
         {
-            JSONPlayerKilled pk = new JSONPlayerKilled
+            return new JSONPlayerKilled
             {
                 attacker = assemblePlayerDetailed(pke.Killer),
                 victim = assemblePlayerDetailed(pke.Killer),
@@ -76,20 +62,18 @@ namespace CSGO_ED.src.JSON
                 penetrated = pke.PenetratedObjects,
                 hitgroup = 0
             };
-            return JsonConvert.SerializeObject(pk, Formatting.Indented);
         }
 
-        public string parseWeaponFire(WeaponFiredEventArgs we)
+        public JSONWeaponFire assembleWeaponFire(WeaponFiredEventArgs we)
         {
-            JSONWeaponFire wf = new JSONWeaponFire
+            return new JSONWeaponFire
             {
                 shooter = assemblePlayerDetailed(we.Shooter)
-                
+
             };
-            return JsonConvert.SerializeObject(wf, Formatting.Indented);
         }
 
-        public string parsePlayerHurt(PlayerHurtEventArgs phe)
+        public JSONPlayerHurt assemblePlayerHurt(PlayerHurtEventArgs phe)
         {
             JSONPlayerHurt ph = new JSONPlayerHurt
             {
@@ -102,28 +86,32 @@ namespace CSGO_ED.src.JSON
                 hitgroup = phe.Hitgroup.ToString(),
                 //weapon = ph.Weapon
             };
-            return JsonConvert.SerializeObject(ph, Formatting.Indented);
+            return ph;
         }
 
-        public string parsePlayerFootstep(Player p)
+        public JSONPlayerFootstep assemblePlayerFootstep(Player p)
         {
-            JSONPlayerFootstep pf = new JSONPlayerFootstep
+            return new JSONPlayerFootstep
             {
                 player = assemblePlayer(p)
             };
-            return JsonConvert.SerializeObject(pf, Formatting.Indented);
         }
 
         public string parseNade(EquipmentElement nadetype, Player thrownby, Vector position, Player[] ps)
         {
-            JSONNades nd = new JSONNades
+            JSONNades nd = assembleNade(nadetype, thrownby, position, ps);
+            return JsonConvert.SerializeObject(nd, Formatting.None);
+        }
+
+        public JSONNades assembleNade(EquipmentElement nadetype, Player thrownby, Vector position, Player[] ps)
+        {
+            return new JSONNades
             {
                 thrownby = assemblePlayer(thrownby),
                 nadetype = nadetype.ToString(),
                 position = new JSONPosition3D { x = position.X, y = position.Y, z = position.Z },
                 flashedplayers = assemblePlayers(ps)
             };
-            return JsonConvert.SerializeObject(nd, Formatting.Indented);
         }
 
         #region NADES
@@ -175,22 +163,32 @@ namespace CSGO_ED.src.JSON
 
         private string parseBomb(BombEventArgs be)
         {
-            JSONBombEvents b = new JSONBombEvents
+            JSONBomb b = assembleBomb(be);
+            return JsonConvert.SerializeObject(b, Formatting.Indented);
+        }
+
+        public JSONBomb assembleBomb(BombEventArgs be)
+        {
+            return new JSONBomb
             {
                 site = be.Site,
                 player = assemblePlayer(be.Player)
             };
-            return JsonConvert.SerializeObject(b, Formatting.Indented);
         }
 
         private string parseBombDefuse(BombDefuseEventArgs bde)
         {
-            JSONBombEvents b = new JSONBombEvents
+            JSONBomb b = assembleBombDefuse(bde);
+            return JsonConvert.SerializeObject(b, Formatting.Indented);
+        }
+
+        public JSONBomb assembleBombDefuse(BombDefuseEventArgs bde)
+        {
+            return new JSONBomb
             {
                 haskit = bde.HasKit,
                 player = assemblePlayer(bde.Player)
             };
-            return JsonConvert.SerializeObject(b, Formatting.Indented);
         }
 
         #region Bombevents
@@ -241,21 +239,6 @@ namespace CSGO_ED.src.JSON
         }
 
         #region SUBEVENTS
-
-        public string parseMap()
-        {
-            return "\"mapname\": \"" + parser.Map + "\"";
-        }
-
-        public string parseTickRate()
-        {
-            return "\"tickrate\": \"" + parser.TickRate + "\"";
-        }
-
-        public string parsePlayerMeta(Player p)
-        {
-            return "\"player\": { \"player_id\": \"" + p.EntityID + "\", " + "\"playername\": \""+ p.Name + "\", \"team\": \"" + p.Team + "\"" + ", \"clan\": \"" + getClan(p)+ "\"" + ", \"steam_id\": \"" + p.SteamID + "\"}";
-        }
         
         private string getClan(Player p)
         {
@@ -267,12 +250,8 @@ namespace CSGO_ED.src.JSON
             }
         }
 
-        public string parsePlayers(Player[] ps)
-        {
-            return JsonConvert.SerializeObject(assemblePlayers(ps), Formatting.Indented);
-        }
 
-        private List<JSONPlayer> assemblePlayers(Player[] ps)
+        public List<JSONPlayer> assemblePlayers(Player[] ps)
         {
             if (ps == null)
                 return null;
@@ -283,12 +262,19 @@ namespace CSGO_ED.src.JSON
             return players;
         }
 
-        public string parsePlayer(Player p)
+        public List<JSONPlayerMeta> assemblePlayers(IEnumerable<Player> ps)
         {
-            return JsonConvert.SerializeObject(assemblePlayer(p), Formatting.Indented);
+            if (ps == null)
+                return null;
+            List<JSONPlayerMeta> players = new List<JSONPlayerMeta>();
+            foreach (var player in ps)
+                players.Add(assemblePlayerMeta(player));
+
+            return players;
         }
 
-        private JSONPlayer assemblePlayer(Player p)
+
+        public JSONPlayer assemblePlayer(Player p)
         {
             JSONPlayer player = new JSONPlayer
             {
@@ -301,12 +287,21 @@ namespace CSGO_ED.src.JSON
             return player;
         }
 
-        public string parsePlayerDetailed(Player p)
+        public JSONPlayerMeta assemblePlayerMeta(Player p)
         {
-            return JsonConvert.SerializeObject(assemblePlayerDetailed(p), Formatting.Indented);
+            JSONPlayerMeta player = new JSONPlayerMeta
+            {
+                playername = p.Name,
+                player_id = p.EntityID,
+                team = p.Team.ToString(),
+                clanname = p.AdditionaInformations.Clantag,
+                steam_id = p.SteamID
+            
+            };
+            return player;
         }
 
-        private JSONPlayerDetailed assemblePlayerDetailed(Player p)
+        public JSONPlayerDetailed assemblePlayerDetailed(Player p)
         {
             JSONPlayerDetailed playerdetailed = new JSONPlayerDetailed
             {
@@ -324,12 +319,8 @@ namespace CSGO_ED.src.JSON
             return playerdetailed;
         }
 
-        public string parsePlayerDetailedWithEquipment(Player p)
-        {
-            return JsonConvert.SerializeObject(assemblePlayerDetailedWithItems(p), Formatting.Indented);
-        }
 
-        private JSONPlayerDetailedWithItems assemblePlayerDetailedWithItems(Player p)
+        public JSONPlayerDetailedWithItems assemblePlayerDetailedWithItems(Player p)
         {
             JSONPlayerDetailedWithItems playerdetailed = new JSONPlayerDetailedWithItems
             {
@@ -348,7 +339,7 @@ namespace CSGO_ED.src.JSON
             return playerdetailed;
         }
 
-        private List<JSONItem> assembleWeapons(IEnumerable<Equipment> wps)
+        public List<JSONItem> assembleWeapons(IEnumerable<Equipment> wps)
         {
             List<JSONItem> jwps = new List<JSONItem>();
             foreach (var w in wps)
@@ -356,7 +347,7 @@ namespace CSGO_ED.src.JSON
 
             return jwps;
         }
-        private JSONItem assembleWeapon(Equipment wp)
+        public JSONItem assembleWeapon(Equipment wp)
         {
             JSONItem jwp = new JSONItem
             {

@@ -55,13 +55,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\GameStateGenerator.cs" />
-    <Compile Include="src\JSON\events\JSONBombEvents.cs" />
+    <Compile Include="src\JSON\events\JSONBomb.cs" />
+    <Compile Include="src\JSON\events\JSONGameevent.cs" />
     <Compile Include="src\JSON\events\JSONNades.cs" />
     <Compile Include="src\JSON\events\JSONPlayerFootstep.cs" />
     <Compile Include="src\JSON\events\JSONPlayerHurt.cs" />
     <Compile Include="src\JSON\events\JSONPlayerKilled.cs" />
     <Compile Include="src\JSON\events\JSONWeaponFire.cs" />
     <Compile Include="src\JSON\JSONParser.cs" />
+    <Compile Include="src\JSON\objects\JSONGamemeta.cs" />
+    <Compile Include="src\JSON\objects\JSONGamestate.cs" />
+    <Compile Include="src\JSON\objects\JSONMatch.cs" />
+    <Compile Include="src\JSON\objects\JSONRound.cs" />
+    <Compile Include="src\JSON\objects\JSONTick.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONPlayer.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONPlayerDetailed.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONPlayerDetailedWithItems.cs" />

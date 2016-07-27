@@ -8,10 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CSGO_ED.src;
+using GameStateGenerator.src;
 using DemoInfo;
 
-namespace CSGO_ED
+namespace GameStateGenerator
 {
     public partial class StartView : Form
     {
@@ -40,7 +40,7 @@ namespace CSGO_ED
             {
                 using (var demoparser = new DemoParser(File.OpenRead(path))) //Force garbage collection since outputstream of the parser cannot be changed
                 {
-                    GameStateGenerator.GenerateJSONFile(demoparser,path);
+                    src.GameStateGenerator.GenerateJSONFile(demoparser, path);
                 }
             }
             

@@ -8,7 +8,7 @@ using demojsonparser.src.JSON.objects.subobjects;
 
 namespace demojsonparser.src.JSON.events
 {
-    class JSONPlayerHurt
+    class JSONPlayerHurt : JSONGameevent
     {
         public JSONPlayer attacker { get; set; }
         public JSONPlayer vicitim { get; set; }

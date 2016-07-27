@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace demojsonparser.src.JSON.objects
 {
-    class JSONPlayerMeta : JSONPlayer
+    class JSONMatch
     {
-        public string clanname { get; set; }
-        public long steam_id { get; set; }
+        public List<JSONRound> rounds { get; set; }
     }
 }
