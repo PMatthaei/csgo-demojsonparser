@@ -60,7 +60,8 @@ namespace GameStateGenerator.src.JSON
                 victim = assemblePlayerDetailed(pke.Killer),
                 headhshot = pke.Headshot,
                 penetrated = pke.PenetratedObjects,
-                hitgroup = 0
+                hitgroup = 0,
+                weapon = assembleWeapon(pke.Weapon)
             };
         }
 
@@ -68,8 +69,8 @@ namespace GameStateGenerator.src.JSON
         {
             return new JSONWeaponFire
             {
-                shooter = assemblePlayerDetailed(we.Shooter)
-
+                shooter = assemblePlayerDetailed(we.Shooter),
+                weapon = assembleWeapon(we.Weapon)
             };
         }
 
@@ -78,13 +79,13 @@ namespace GameStateGenerator.src.JSON
             JSONPlayerHurt ph = new JSONPlayerHurt
             {
                 attacker = assemblePlayer(phe.Attacker),
-                vicitim = assemblePlayer(phe.Player),
+                victim = assemblePlayer(phe.Player),
                 armor = phe.Armor,
                 armor_damage = phe.ArmorDamage,
                 HP = phe.Health,
                 HP_damage = phe.HealthDamage,
                 hitgroup = phe.Hitgroup.ToString(),
-                //weapon = ph.Weapon
+                weapon = assembleWeapon(phe.Weapon)
             };
             return ph;
         }
@@ -347,6 +348,7 @@ namespace GameStateGenerator.src.JSON
 
             return jwps;
         }
+
         public JSONItem assembleWeapon(Equipment wp)
         {
             JSONItem jwp = new JSONItem

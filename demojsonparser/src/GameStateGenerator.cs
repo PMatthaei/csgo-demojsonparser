@@ -25,6 +25,7 @@ namespace GameStateGenerator.src
 
         public static void GenerateJSONFile(DemoParser parser, string path)
         {
+            //Init lists
             match.rounds = new List<JSONRound>();
             round.ticks = new List<JSONTick>();
             tick.tickevents = new List<JSONGameevent>();
@@ -83,11 +84,16 @@ namespace GameStateGenerator.src
             parser.RoundEnd += (sender, e) => {
                 if (hasMatchStarted)
                 {
-                    hasRoundStarted = false;
                     roundwinner = e.Winner;
-                    match.rounds.Add(round);
-                    round = new JSONRound();
-                    round.ticks = new List<JSONTick>();
+                    if (hasRoundStarted)
+                    {
+                        match.rounds.Add(round);
+                        round = new JSONRound();
+                        round.ticks = new List<JSONTick>();
+                    }
+
+                    hasRoundStarted = false;
+
                 }
 
             };
@@ -129,28 +135,28 @@ namespace GameStateGenerator.src
             parser.ExplosiveNadeExploded += (object sender, GrenadeEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    //jsonparser.dump(jsonparser.parseHegrenadeDetonated(e));
+                    tick.tickevents.Add(jsonparser.assembleNade(e.NadeType,e.ThrownBy,e.Position, null));
                 }
             };
 
             parser.FireNadeStarted += (object sender, FireEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    //jsonparser.dump(jsonparser.parseFiregrenadeDetonated(e));
+                    tick.tickevents.Add(jsonparser.assembleNade(e.NadeType, e.ThrownBy, e.Position, null));
                 }
             };
 
             parser.FireNadeEnded += (object sender, FireEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    //jsonparser.dump(jsonparser.parseFiregrenadeEnded(e));
+                    tick.tickevents.Add(jsonparser.assembleNade(e.NadeType, e.ThrownBy, e.Position, null));
                 }
             };
 
             parser.SmokeNadeStarted += (object sender, SmokeEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    //jsonparser.dump(jsonparser.parseSmokegrenadeDetonated(e));
+                    tick.tickevents.Add(jsonparser.assembleNade(e.NadeType, e.ThrownBy, e.Position, null));
                 }
             };
 
@@ -158,66 +164,66 @@ namespace GameStateGenerator.src
             parser.SmokeNadeEnded += (object sender, SmokeEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    //jsonparser.dump(jsonparser.parseSmokegrenadeEnded(e));
+                    tick.tickevents.Add(jsonparser.assembleNade(e.NadeType, e.ThrownBy, e.Position, null));
                 }
             };
 
             parser.DecoyNadeStarted += (object sender, DecoyEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    //jsonparser.dump(jsonparser.parseDecoyDetonated(e));
+                    tick.tickevents.Add(jsonparser.assembleNade(e.NadeType, e.ThrownBy, e.Position, null));
                 }
             };
 
             parser.DecoyNadeEnded += (object sender, DecoyEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    //jsonparser.dump(jsonparser.parseDecoyEnded(e));
+                    tick.tickevents.Add(jsonparser.assembleNade(e.NadeType, e.ThrownBy, e.Position, null));
                 }
             };
 
             parser.FlashNadeExploded += (object sender, FlashEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    //jsonparser.dump(jsonparser.parseFlashbangDetonated(e));
+                    tick.tickevents.Add(jsonparser.assembleNade(e.NadeType, e.ThrownBy, e.Position, e.FlashedPlayers));
                 }
             };
 
             parser.NadeReachedTarget += (object sender, NadeEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
                 {
-                    //jsonparser.dump(jsonparser.parseNadeReachedTarget(e));
+                    tick.tickevents.Add(jsonparser.assembleNade(e.NadeType, e.ThrownBy, e.Position, null));
                 }
             };
             #endregion
 
             #region Bombevents
             parser.BombAbortPlant += (object sender, BombEventArgs e) => {
-                //jsonparser.dump(jsonparser.parseBombAbortPlant(e));
+                tick.tickevents.Add(jsonparser.assembleBomb(e));
             };
 
             parser.BombAbortDefuse += (object sender, BombDefuseEventArgs e) => {
-                //jsonparser.dump(jsonparser.parseBombAbortDefuse(e));
+                tick.tickevents.Add(jsonparser.assembleBombDefuse(e));
             };
 
             parser.BombBeginPlant += (object sender, BombEventArgs e) => {
-                //jsonparser.dump(jsonparser.parseBombBeginPlant(e));
+                tick.tickevents.Add(jsonparser.assembleBomb(e));
             };
 
             parser.BombBeginDefuse += (object sender, BombDefuseEventArgs e) => {
-                //jsonparser.dump(jsonparser.parseBombBeginDefuse(e));
+                tick.tickevents.Add(jsonparser.assembleBombDefuse(e));
             };
 
             parser.BombPlanted += (object sender, BombEventArgs e) => {
-                //jsonparser.dump(jsonparser.parseBombPlanted(e));
+                tick.tickevents.Add(jsonparser.assembleBomb(e));
             };
 
             parser.BombDefused += (object sender, BombEventArgs e) => {
-                //jsonparser.dump(jsonparser.parseBombDefused(e));
+                tick.tickevents.Add(jsonparser.assembleBomb(e));
             };
 
             parser.BombExploded += (object sender, BombEventArgs e) => {
-                //jsonparser.dump(jsonparser.parseBombExploded(e));
+                tick.tickevents.Add(jsonparser.assembleBomb(e));
             };
             #endregion
 
@@ -246,11 +252,10 @@ namespace GameStateGenerator.src
                 if (tick_id % positioninterval == 0 )
                     foreach (var player in parser.PlayingParticipants)
                     {
-
+                        tick.tickevents.Add(jsonparser.assemblePlayerFootstep(player));
                     }
 
                 tick_id++;
-                tick.tick_id = tick_id;
             };
 
             //Parse tickwise and add the resulting tick to the round object
@@ -258,12 +263,17 @@ namespace GameStateGenerator.src
             while (hasnext)
             {
                 hasnext = parser.ParseNextTick();
-                round.ticks.Add(tick);
-                tick = new JSONTick();
-                tick.tickevents = new List<JSONGameevent>();
+                if (hasRoundStarted)
+                {
+                    tick.tick_id = tick_id;
+                    round.ticks.Add(tick);
+                    tick = new JSONTick();
+                    tick.tickevents = new List<JSONGameevent>();
+                }
+
             }
 
-
+            //Parse the complete gamestate object
             jsonparser.dump(gs);
 
             jsonparser.stopParser();

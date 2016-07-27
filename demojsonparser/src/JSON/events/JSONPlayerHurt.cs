@@ -11,7 +11,7 @@ namespace demojsonparser.src.JSON.events
     class JSONPlayerHurt : JSONGameevent
     {
         public JSONPlayer attacker { get; set; }
-        public JSONPlayer vicitim { get; set; }
+        public JSONPlayer victim { get; set; }
         public int HP { get; set; }
         public int armor { get; set; }
         public int armor_damage { get; set; }
