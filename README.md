@@ -8,5 +8,5 @@ Data about the CS:GO demos is parsed and provided by:
 
 DemoInfo - https://github.com/StatsHelix/demoinfo
 
-This data is than serialized by JSOn.Newtonsoft - http://www.newtonsoft.com/json
+This data is than serialized by Newtonsoft.JSON - http://www.newtonsoft.com/json
 
