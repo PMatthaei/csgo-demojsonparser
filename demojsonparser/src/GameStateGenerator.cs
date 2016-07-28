@@ -5,15 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
-using GameStateGenerator.src.JSON;
+using demojsonparser.src.JSON;
 using DemoInfo;
 using Newtonsoft.Json;
 using demojsonparser.src.JSON.objects;
 using demojsonparser.src.JSON.events;
 
-namespace GameStateGenerator.src
+namespace demojsonparser.src
 {
-    class GameStateGenerator
+    public class GameStateGenerator
     {
         static int tick_id = 0;
 
@@ -281,7 +281,17 @@ namespace GameStateGenerator.src
             bool hasnext = true;
             while (hasnext)
             {
-                hasnext = parser.ParseNextTick();
+                try
+                {
+                    hasnext = parser.ParseNextTick();
+                }
+                catch (System.IO.EndOfStreamException e)
+                {
+                    jsonparser.dump("Problem with tickparsing. Is your .dem a valid (not to old) one?");
+                    jsonparser.dump(e.StackTrace);
+                    return;
+                }
+
                 if (hasRoundStarted)
                 {
                     tick.tick_id = tick_id;

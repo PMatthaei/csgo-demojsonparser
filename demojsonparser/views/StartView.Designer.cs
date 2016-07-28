@@ -1,4 +1,4 @@
-﻿namespace GameStateGenerator
+﻿namespace demojsonparser
 {
     partial class StartView
     {
@@ -49,7 +49,7 @@
             this.headline.Font = new System.Drawing.Font("Calibri", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.headline.Location = new System.Drawing.Point(247, 0);
             this.headline.Name = "headline";
-            this.headline.Size = new System.Drawing.Size(847, 93);
+            this.headline.Size = new System.Drawing.Size(846, 93);
             this.headline.TabIndex = 0;
             this.headline.Text = "CS:GO-Demo to JSON Parser";
             this.headline.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -62,7 +62,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.2848F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.7152F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 166F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 167F));
             this.tableLayoutPanel1.Controls.Add(this.headline, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.button_parseJSON, 1, 2);
@@ -85,7 +85,7 @@
             this.flowLayoutPanel1.Location = new System.Drawing.Point(247, 96);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Padding = new System.Windows.Forms.Padding(10, 10, 0, 0);
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(847, 50);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(846, 50);
             this.flowLayoutPanel1.TabIndex = 1;
             // 
             // label1
@@ -120,7 +120,7 @@
             // 
             this.button_parseJSON.Location = new System.Drawing.Point(247, 152);
             this.button_parseJSON.Name = "button_parseJSON";
-            this.button_parseJSON.Size = new System.Drawing.Size(847, 51);
+            this.button_parseJSON.Size = new System.Drawing.Size(846, 51);
             this.button_parseJSON.TabIndex = 2;
             this.button_parseJSON.Text = "Parse .dem to GameState JSON";
             this.button_parseJSON.UseVisualStyleBackColor = true;

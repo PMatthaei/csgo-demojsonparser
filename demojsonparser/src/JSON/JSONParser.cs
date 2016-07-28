@@ -10,7 +10,7 @@ using demojsonparser.src.JSON.objects;
 using demojsonparser.src.JSON.events;
 using demojsonparser.src.JSON.objects.subobjects;
 
-namespace GameStateGenerator.src.JSON
+namespace demojsonparser.src.JSON
 {
     class JSONParser
     {
@@ -30,6 +30,10 @@ namespace GameStateGenerator.src.JSON
         public void dump(JSONGamestate gs)
         {
             outputStream.Write(JsonConvert.SerializeObject(gs, Formatting.Indented));
+        }
+        public void dump(string s)
+        {
+            outputStream.Write(s);
         }
 
         public void stopParser()
@@ -304,6 +308,12 @@ namespace GameStateGenerator.src.JSON
 
         public JSONItem assembleWeapon(Equipment wp)
         {
+            if (wp == null)
+            {
+                Console.WriteLine("Weapon null. Bytestream not suitable for this version of DemoInfo");
+                return new JSONItem();
+            }
+
             JSONItem jwp = new JSONItem
             {
                 weapon = wp.Weapon.ToString(),

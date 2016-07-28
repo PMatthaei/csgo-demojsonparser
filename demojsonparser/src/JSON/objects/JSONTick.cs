@@ -7,7 +7,7 @@ using demojsonparser.src.JSON.events;
 
 namespace demojsonparser.src.JSON.objects
 {
-    class JSONTick
+    public class JSONTick
     {
         public int tick_id { get; set; }
         public List<JSONGameevent> tickevents { get; set; }

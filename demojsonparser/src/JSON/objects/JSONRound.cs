@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace demojsonparser.src.JSON.objects
 {
-    class JSONRound
+    public class JSONRound
     {
         public int round_id { get; set; }
         public string winner { get; set; }

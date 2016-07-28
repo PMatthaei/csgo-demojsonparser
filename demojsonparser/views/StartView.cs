@@ -8,10 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GameStateGenerator.src;
+using demojsonparser.src;
 using DemoInfo;
 
-namespace GameStateGenerator
+namespace demojsonparser
 {
     public partial class StartView : Form
     {
