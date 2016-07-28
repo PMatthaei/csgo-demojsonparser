@@ -43,9 +43,6 @@ namespace demojsonparser.src
 
             int round_id = 0;
 
-            int roundkills = 0;
-            Team roundwinner = Team.Spectate; //This default value whill cause errors if not correctly assigned!
-
             List<Player> ingame_players = new List<Player>(); //All players
 
             //Measure time to roughly check performance
@@ -85,8 +82,7 @@ namespace demojsonparser.src
             parser.RoundEnd += (sender, e) => {
                 if (hasMatchStarted)
                 {
-                    roundwinner = e.Winner;
-                    if (hasRoundStarted)
+                    if (hasRoundStarted) //TODO: maybe round fires false -> do in tickdone event (see github issues of DemoInfo)
                     {
                         round.winner = e.Winner.ToString();
                         match.rounds.Add(round);
@@ -101,8 +97,6 @@ namespace demojsonparser.src
             };
 
 
-            //All events that happen during a tick
-
 
             parser.WeaponFired += (object sender, WeaponFiredEventArgs we) => {
                 if (hasMatchStarted)
@@ -113,12 +107,10 @@ namespace demojsonparser.src
             parser.PlayerKilled += (object sender, PlayerKilledEventArgs e) => {
                 if (hasMatchStarted)
                 {
-                    roundkills++;
                     //the killer is null if vicitm is killed by the world - eg. by falling
                     if (e.Killer != null)
-                    {
                         tick.tickevents.Add(jsonparser.assemblePlayerKilled(e));
-                    }
+                    
                 }
 
             };
@@ -127,76 +119,58 @@ namespace demojsonparser.src
                 if (hasMatchStarted)
                     //the attacker is null if vicitm is damaged by the world - eg. by falling
                     if (e.Attacker != null)
-                    {
                         tick.tickevents.Add(jsonparser.assemblePlayerHurt(e));
-                    }
+                    
             };
 
             #region Nadeevents
             //Nade (Smoke Fire Decoy Flashbang and HE) events
             parser.ExplosiveNadeExploded += (object sender, GrenadeEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
-                {
                     tick.tickevents.Add(jsonparser.assembleHEGrenade(e));
-                }
             };
 
             parser.FireNadeStarted += (object sender, FireEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
-                {
                     tick.tickevents.Add(jsonparser.assembleFiregrenade(e));
-                }
             };
 
             parser.FireNadeEnded += (object sender, FireEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
-                {
                     tick.tickevents.Add(jsonparser.assembleFiregrenadeEnded(e));
-                }
             };
 
             parser.SmokeNadeStarted += (object sender, SmokeEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
-                {
                     tick.tickevents.Add(jsonparser.assembleSmokegrenade(e));
-                }
             };
 
 
             parser.SmokeNadeEnded += (object sender, SmokeEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
-                {
                     tick.tickevents.Add(jsonparser.assembleSmokegrenadeEnded(e));
-                }
             };
 
             parser.DecoyNadeStarted += (object sender, DecoyEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
-                {
                     tick.tickevents.Add(jsonparser.assembleDecoy(e));
-                }
             };
 
             parser.DecoyNadeEnded += (object sender, DecoyEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
-                {
                     tick.tickevents.Add(jsonparser.assembleDecoyEnded(e));
-                }
             };
 
             parser.FlashNadeExploded += (object sender, FlashEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
-                {
                     tick.tickevents.Add(jsonparser.assembleFlashbang(e));
-                }
             };
 
             parser.NadeReachedTarget += (object sender, NadeEventArgs e) => {
                 if (e.ThrownBy != null && hasMatchStarted)
-                {
                     tick.tickevents.Add(jsonparser.assembleNade(e.NadeType, e.ThrownBy, e.Position, null));
-                }
             };
+
             #endregion
 
             #region Bombevents
@@ -259,10 +233,10 @@ namespace demojsonparser.src
             };
             */
             parser.FreezetimeEnded += (object sender, FreezetimeEndedEventArgs e) => {
-                hasFreeezEnded = true; //Neglect movement(later used) when freezetime is active
+                hasFreeezEnded = true; //Just capture movement after freezetime has ended
             };
 
-            //Open a tick object
+            //Create a tick object
             parser.TickDone += (sender, e) => {
                 if (!hasMatchStarted) //Dont count ticks if the game has not started already (dismissing warmup and knife-phase for official matches)
                     return;
@@ -302,9 +276,10 @@ namespace demojsonparser.src
 
             }
 
-            //Parse the complete gamestate object
+            //Dump the complete gamestate object into JSON-file
             jsonparser.dump(gs);
 
+            //Work is done.
             jsonparser.stopParser();
 
             watch.Stop();
