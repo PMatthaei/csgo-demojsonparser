@@ -27,9 +27,13 @@ namespace demojsonparser.src.JSON
             outputStream = new StreamWriter(outputpath);
         }
 
-        public void dump(JSONGamestate gs)
+        public void dump(JSONGamestate gs, bool prettyjson)
         {
-            outputStream.Write(JsonConvert.SerializeObject(gs, Formatting.Indented));
+            Formatting f = Formatting.None;
+            if (prettyjson)
+                f = Formatting.Indented;
+
+            outputStream.Write(JsonConvert.SerializeObject(gs, f));
         }
         public void dump(string s)
         {

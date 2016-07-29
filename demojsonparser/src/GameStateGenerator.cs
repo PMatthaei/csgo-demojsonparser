@@ -277,7 +277,7 @@ namespace demojsonparser.src
             }
 
             //Dump the complete gamestate object into JSON-file
-            jsonparser.dump(gs);
+            jsonparser.dump(gs,false);
 
             //Work is done.
             jsonparser.stopParser();
