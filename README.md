@@ -2,7 +2,7 @@
 
 Feed a valid* .dem and he will spit out a valid json containing information about every tick in every round of your game as well as some metadata about it.
 
-This is a JSONParser using the following format : coming soon
+This is a JSONParser using the following format :[Click here](https://github.com/PMatthaei/demojsonparser-csgo/blob/master/JSONFORMAT.md)
 
 Data about the CS:GO demos is parsed and provided by:
 
