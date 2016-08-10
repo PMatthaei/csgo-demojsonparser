@@ -305,7 +305,7 @@ namespace demojsonparser.src.JSON
                 hasdefuser = p.HasDefuseKit,
                 HP = p.HP,
                 armor = p.Armor,
-                velocity = p.Velocity.Absolute //Length of Movementvector -> Velocity
+                velocity = p.Velocity.Absolute, //Length of Movementvector -> Velocity
                 items = assembleWeapons(p.Weapons)
             };
 
