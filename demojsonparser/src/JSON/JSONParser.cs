@@ -26,7 +26,11 @@ namespace demojsonparser.src.JSON
             string outputpath = path.Replace(".dem", "") + ".json";
             outputStream = new StreamWriter(outputpath);
         }
-
+        /// <summary>
+        /// Dumps the Gamestate in prettyjson or as one-liner(default)
+        /// </summary>
+        /// <param name="gs"></param>
+        /// <param name="prettyjson"></param>
         public void dump(JSONGamestate gs, bool prettyjson)
         {
             Formatting f = Formatting.None;
@@ -35,6 +39,11 @@ namespace demojsonparser.src.JSON
 
             outputStream.Write(JsonConvert.SerializeObject(gs, f));
         }
+
+        /// <summary>
+        /// Dumps a string to the json
+        /// </summary>
+        /// <param name="s"></param>
         public void dump(string s)
         {
             outputStream.Write(s);
@@ -66,7 +75,7 @@ namespace demojsonparser.src.JSON
             {
                 gameevent = "player_killed",
                 attacker = assemblePlayerDetailed(pke.Killer),
-                victim = assemblePlayerDetailed(pke.Killer),
+                victim = assemblePlayerDetailed(pke.Victim),
                 headhshot = pke.Headshot,
                 penetrated = pke.PenetratedObjects,
                 hitgroup = 0,
@@ -275,7 +284,8 @@ namespace demojsonparser.src.JSON
                 hasHelmet = p.HasHelmet,
                 hasdefuser = p.HasDefuseKit,
                 HP = p.HP,
-                armor = p.Armor
+                armor = p.Armor,
+                velocity = p.Velocity.Absolute //Length of Movementvector -> Velocity
             };
 
             return playerdetailed;

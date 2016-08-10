@@ -14,5 +14,7 @@ namespace demojsonparser.src.JSON.objects
         public bool hasdefuser { get; set; }
         public bool hasbomb { get; set; }
         public bool isducking { get; set; }
+        public double velocity { get; set; }
+        public double velocity2 { get; set; }
     }
 }
