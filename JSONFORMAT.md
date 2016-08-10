@@ -1,1 +1,1 @@
-# JSON Gamestate object of a dem file
+# Gamestate JSON-Object Format for CS:GO Demofiles:
