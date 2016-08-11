@@ -90,6 +90,7 @@
     <Compile Include="src\JSON\objects\subobjects\JSONFacing.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONItem.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONPosition3D.cs" />
+    <Compile Include="src\logging\Logger.cs" />
     <Compile Include="views\StartView.cs">
       <SubType>Form</SubType>
     </Compile>
