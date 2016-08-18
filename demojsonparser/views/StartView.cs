@@ -18,10 +18,10 @@ namespace demojsonparser
         public StartView()
         {
             InitializeComponent();
-        }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
+            chooseLayout.BackColor = Color.FromArgb(35, Color.Black);
+            headline.BackColor = Color.FromArgb(45, Color.Black);
+            errorLayout.BackColor = Color.FromArgb(45, Color.Black);
 
         }
 
@@ -29,6 +29,7 @@ namespace demojsonparser
         {
             fileDialogChoose.Multiselect = true;
             fileDialogChoose.Filter = "CS:GO Demo File|*.dem";
+            fileDialogChoose.FileName = "";
 
             if (fileDialogChoose.ShowDialog() == DialogResult.OK)
                 textBoxChoose.Text = String.Join("", fileDialogChoose.FileNames);

@@ -23,6 +23,9 @@ namespace demojsonparser.src.logging
         {
             lognr++;
             m_exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            long length = new System.IO.FileInfo(m_exePath).Length;
+            /// TODO: wipe file if its getting to big 
             try
             {
                 using (StreamWriter w = File.AppendText(m_exePath + "\\" + "log.txt"))
@@ -39,7 +42,7 @@ namespace demojsonparser.src.logging
         {
             try
             {
-                txtWriter.Write("\r\nLog Entry Nr. "+lognr+" : ");
+                txtWriter.Write("\r\nLog Entry Nr. " + lognr + " : ");
                 txtWriter.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
                     DateTime.Now.ToLongDateString());
                 txtWriter.WriteLine("  :");
