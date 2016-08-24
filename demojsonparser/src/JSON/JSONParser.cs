@@ -14,9 +14,10 @@ namespace demojsonparser.src.JSON
 {
     class JSONParser
     {
+        enum Eventtype { SMOKENADE, SMOKENADE_ENDED, FLASH, FLASH_ENDED, HEGRENADE, DECOY, DECOY_ENDED };
 
-        StreamWriter outputStream;
-        DemoParser parser;
+        private static StreamWriter outputStream;
+        private DemoParser parser;
 
         enum PlayerType {META, NORMAL, DETAILED, WITHEQUIPMENT };
 
@@ -120,96 +121,54 @@ namespace demojsonparser.src.JSON
         }
 
         #region Nades
-        public string parseNade(EquipmentElement nadetype, Player thrownby, Vector position, Player[] ps)
-        {
-            JSONNades nd = assembleNade(nadetype, thrownby, position, ps);
-            return JsonConvert.SerializeObject(nd, Formatting.None);
-        }
 
-        public JSONNades assembleNade(EquipmentElement nadetype, Player thrownby, Vector position, Player[] ps)
+        public JSONNade assembleNade(NadeEventArgs e, string eventname)
         {
-            return new JSONNades
+            Player[] ps = null;
+
+            if (e.GetType() == typeof(FlashEventArgs)) //Exception for FlashEvents -> we need flashed players
             {
-                thrownby = assemblePlayer(thrownby),
-                nadetype = nadetype.ToString(),
-                position = new JSONPosition3D { x = position.X, y = position.Y, z = position.Z },
-                flashedplayers = assemblePlayers(ps)
+                FlashEventArgs f = e as FlashEventArgs;
+                ps = f.FlashedPlayers;
+                return new JSONFlashNade
+                {
+                    gameevent = eventname,
+                    thrownby = assemblePlayer(e.ThrownBy),
+                    nadetype = e.NadeType.ToString(),
+                    position = new JSONPosition3D { x = e.Position.X, y = e.Position.Y, z = e.Position.Z },
+                    flashedplayers = assemblePlayers(f.FlashedPlayers)
+                };
+            }
+
+            return new JSONNade
+            {
+                gameevent = eventname,
+                thrownby = assemblePlayer(e.ThrownBy),
+                nadetype = e.NadeType.ToString(),
+                position = new JSONPosition3D { x = e.Position.X, y = e.Position.Y, z = e.Position.Z },
             };
         }
 
-        public JSONNades assembleHEGrenade(GrenadeEventArgs he)
-        {
-            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
-            n.gameevent = "hegrenade_detonated";
-            return n;
-        }
 
-        public JSONNades assembleSmokegrenade(SmokeEventArgs he)
-        {
-            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
-            n.gameevent = "smokegrenade_detonated";
-            return n;
-        }
-
-        public JSONNades assembleFiregrenade(FireEventArgs he)
-        {
-            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
-            n.gameevent = "firegrenade_detonated";
-            return n;
-        }
-
-        public JSONNades assembleFlashbang(FlashEventArgs he)
-        {
-            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, he.FlashedPlayers);
-            n.gameevent = "flashbang_detonated";
-            return n;
-        }
-
-        public JSONNades assembleDecoy(DecoyEventArgs he)
-        {
-            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
-            n.gameevent = "decoy_detonated";
-            return n;
-        }
-
-
-        public JSONNades assembleFiregrenadeEnded(FireEventArgs he)
-        {
-            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
-            n.gameevent = "firegrenade_ended";
-            return n;
-        }
-
-        public JSONNades assembleSmokegrenadeEnded(SmokeEventArgs he)
-        {
-            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
-            n.gameevent = "flashbang_ended";
-            return n;
-        }
-
-        public JSONNades assembleDecoyEnded(DecoyEventArgs he)
-        {
-            JSONNades n = assembleNade(he.NadeType, he.ThrownBy, he.Position, null);
-            n.gameevent = "decoy_ended";
-            return n;
-        }
         #endregion
 
         #region Bombevents
 
-        public JSONBomb assembleBomb(BombEventArgs be)
+        public JSONBomb assembleBomb(BombEventArgs be, string gameevent)
         {
             return new JSONBomb
             {
+                gameevent = gameevent,
                 site = be.Site,
                 player = assemblePlayer(be.Player)
             };
         }
 
-        public JSONBomb assembleBombDefuse(BombDefuseEventArgs bde)
+        public JSONBomb assembleBombDefuse(BombDefuseEventArgs bde, string gameevent)
         {
             return new JSONBomb
             {
+                gameevent = gameevent,
                 haskit = bde.HasKit,
                 player = assemblePlayer(bde.Player)
             };
@@ -341,4 +300,6 @@ namespace demojsonparser.src.JSON
         #endregion
 
     }
+
+
 }

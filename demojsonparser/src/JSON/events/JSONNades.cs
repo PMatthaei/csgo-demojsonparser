@@ -8,11 +8,10 @@ using demojsonparser.src.JSON.objects.subobjects;
 
 namespace demojsonparser.src.JSON.events
 {
-    class JSONNades : JSONGameevent
+    class JSONNade : JSONGameevent
     {
         public string nadetype { get; set; }
         public JSONPlayer thrownby { get; set; }
         public JSONPosition3D position { get; set; }
-        public IList<JSONPlayer> flashedplayers { get; set; }
     }
 }

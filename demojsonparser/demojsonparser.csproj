@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="src\GameStateGenerator.cs" />
     <Compile Include="src\JSON\events\JSONBomb.cs" />
+    <Compile Include="src\JSON\events\JSONFlashNade.cs" />
     <Compile Include="src\JSON\events\JSONGameevent.cs" />
     <Compile Include="src\JSON\events\JSONNades.cs" />
     <Compile Include="src\JSON\events\JSONPlayerFootstep.cs" />
