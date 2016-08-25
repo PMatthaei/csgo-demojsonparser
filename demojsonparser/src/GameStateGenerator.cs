@@ -20,17 +20,28 @@ namespace demojsonparser.src
 
         private const int positioninterval = 8;
 
+        private static StartView sv;
         //
         //
         // TODO:    1) use de-/serialization and streams for less GC and memory consumption?
         //          2) build json object-oriented with markers (#round1) to paste corresponding string
+        //          3) Why are DemoInfo objects kept after using statement? (in StartView.cs)
         //
-        public static JSONMatch match = new JSONMatch();
-        public static JSONRound round = new JSONRound();
-        public static JSONTick tick = new JSONTick();
+
+
 
         public static void GenerateJSONFile(DemoParser parser, string path)
         {
+
+            //Measure time to roughly check performance
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
+            //TODO: Check why/how GC is not grabbing the gamestate if these are within GenerateJSONFile()
+            JSONMatch match = new JSONMatch();
+            JSONRound round = new JSONRound();
+            JSONTick tick = new JSONTick();
+            JSONParser jsonparser;
+            JSONGamestate gs;
 
             //JSONTick nulltick = new JSONTick(); //Just for testing or if empty ticks are wanted
 
@@ -41,14 +52,13 @@ namespace demojsonparser.src
             int tick_id = 0;
             int round_id = 0;
 
-            //Measure time to roughly check performance
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+
 
             //JSON holding the whole gamestate
-            JSONGamestate gs = new JSONGamestate();
+            gs = new JSONGamestate();
 
             //Parser to transform DemoParser events to JSON format
-            JSONParser jsonparser = new JSONParser(parser, path);
+            jsonparser = new JSONParser(parser, path);
 
             //Init lists
             match.rounds = new List<JSONRound>();
@@ -282,9 +292,11 @@ namespace demojsonparser.src
                 }
                 catch (System.IO.EndOfStreamException e)
                 {
-                    jsonparser.dump("Problem with tickparsing. Is your .dem valid? See this projects github page for more info.");
-                    jsonparser.dump("Stacktrace: " + e.StackTrace);
-                    return;
+                    sv.getErrorBox().AppendText("Problem with tickparsing. Is your .dem valid? See this projects github page for more info.\n");
+                    sv.getErrorBox().AppendText("Stacktrace: " + e.StackTrace+ "\n");
+                    jsonparser.stopParser();
+                    watch.Stop();
+                    break;
                 }
 
                 if (hasRoundStarted)
@@ -310,11 +322,25 @@ namespace demojsonparser.src
             //Work is done.
             jsonparser.stopParser();
 
+            gs = null;
+            match = null;
+            round = null;
+            tick = null;
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
             var sec = elapsedMs / 1000.0f;
+            sv.getErrorBox().AppendText("Time to parse: " + path + ": " + sec + "sec. \n");
+            sv.getErrorBox().AppendText("You can find your .json in the same path. \n");
+        }
 
-            //logger.LogWrite("Time to parse:" + path + ": " + sec + "\n");
+        public static void setView(StartView nsv)
+        {
+            sv = nsv;
         }
     }
+
 }

@@ -22,7 +22,14 @@ namespace demojsonparser
             chooseLayout.BackColor = Color.FromArgb(35, Color.Black);
             headline.BackColor = Color.FromArgb(45, Color.Black);
             errorLayout.BackColor = Color.FromArgb(45, Color.Black);
+            
+            GameStateGenerator.setView(this);
 
+        }
+
+        public RichTextBox getErrorBox()
+        {
+            return errorbox;
         }
 
         private void choose_demo_Click(object sender, EventArgs e)
@@ -39,11 +46,21 @@ namespace demojsonparser
         {
             foreach(string path in fileDialogChoose.FileNames)
             {
+                errorbox.AppendText("Start parsing: " + path + "\n");
+                errorbox.Update();
+
                 using (var demoparser = new DemoParser(File.OpenRead(path))) //Force garbage collection since outputstream of the parser cannot be changed
                 {
                     GameStateGenerator.GenerateJSONFile(demoparser, path);
                 }
             }
+
+        }
+
+
+        private void logclear_Click(object sender, EventArgs e)
+        {
+            errorbox.Clear();
 
         }
     }

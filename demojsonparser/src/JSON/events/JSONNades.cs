@@ -8,6 +8,9 @@ using demojsonparser.src.JSON.objects.subobjects;
 
 namespace demojsonparser.src.JSON.events
 {
+    /// <summary>
+    /// JSON holding all information needed(supplied) for every nadetype (except flashbangs see JSONFlashNade)
+    /// </summary>
     class JSONNade : JSONGameevent
     {
         public string nadetype { get; set; }

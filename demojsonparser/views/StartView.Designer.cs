@@ -39,7 +39,7 @@
             this.errorbox = new System.Windows.Forms.RichTextBox();
             this.errorLayout = new System.Windows.Forms.FlowLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
-            this.logdelete = new System.Windows.Forms.Button();
+            this.logclear = new System.Windows.Forms.Button();
             this.fileDialogChoose = new System.Windows.Forms.OpenFileDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.tableLayoutPanel1.SuspendLayout();
@@ -58,7 +58,7 @@
             this.headline.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.headline.Location = new System.Drawing.Point(246, 0);
             this.headline.Name = "headline";
-            this.headline.Size = new System.Drawing.Size(843, 80);
+            this.headline.Size = new System.Drawing.Size(842, 80);
             this.headline.TabIndex = 0;
             this.headline.Text = "CS:GO-Demo to JSON Parser";
             this.headline.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -73,7 +73,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.2848F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.7152F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 171F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 172F));
             this.tableLayoutPanel1.Controls.Add(this.headline, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.chooseLayout, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.button_parseJSON, 1, 2);
@@ -100,7 +100,7 @@
             this.chooseLayout.Location = new System.Drawing.Point(246, 83);
             this.chooseLayout.Name = "chooseLayout";
             this.chooseLayout.Padding = new System.Windows.Forms.Padding(10, 10, 0, 0);
-            this.chooseLayout.Size = new System.Drawing.Size(843, 43);
+            this.chooseLayout.Size = new System.Drawing.Size(842, 43);
             this.chooseLayout.TabIndex = 1;
             // 
             // label1
@@ -135,7 +135,7 @@
             // 
             this.button_parseJSON.Location = new System.Drawing.Point(246, 132);
             this.button_parseJSON.Name = "button_parseJSON";
-            this.button_parseJSON.Size = new System.Drawing.Size(843, 51);
+            this.button_parseJSON.Size = new System.Drawing.Size(842, 51);
             this.button_parseJSON.TabIndex = 2;
             this.button_parseJSON.Text = "Parse .dem to GameState JSON";
             this.button_parseJSON.UseVisualStyleBackColor = true;
@@ -145,7 +145,7 @@
             // 
             this.errorbox.Location = new System.Drawing.Point(246, 279);
             this.errorbox.Name = "errorbox";
-            this.errorbox.Size = new System.Drawing.Size(843, 390);
+            this.errorbox.Size = new System.Drawing.Size(842, 390);
             this.errorbox.TabIndex = 5;
             this.errorbox.Text = "";
             // 
@@ -153,10 +153,10 @@
             // 
             this.errorLayout.BackColor = System.Drawing.Color.DimGray;
             this.errorLayout.Controls.Add(this.label2);
-            this.errorLayout.Controls.Add(this.logdelete);
+            this.errorLayout.Controls.Add(this.logclear);
             this.errorLayout.Location = new System.Drawing.Point(246, 242);
             this.errorLayout.Name = "errorLayout";
-            this.errorLayout.Size = new System.Drawing.Size(843, 31);
+            this.errorLayout.Size = new System.Drawing.Size(842, 31);
             this.errorLayout.TabIndex = 6;
             // 
             // label2
@@ -170,14 +170,15 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "Error logging";
             // 
-            // logdelete
+            // logclear
             // 
-            this.logdelete.Location = new System.Drawing.Point(108, 3);
-            this.logdelete.Name = "logdelete";
-            this.logdelete.Size = new System.Drawing.Size(162, 22);
-            this.logdelete.TabIndex = 3;
-            this.logdelete.Text = "Delete logfile";
-            this.logdelete.UseVisualStyleBackColor = true;
+            this.logclear.Location = new System.Drawing.Point(108, 3);
+            this.logclear.Name = "logclear";
+            this.logclear.Size = new System.Drawing.Size(162, 22);
+            this.logclear.TabIndex = 3;
+            this.logclear.Text = "Clear log";
+            this.logclear.UseVisualStyleBackColor = true;
+            this.logclear.Click += new System.EventHandler(this.logclear_Click);
             // 
             // fileDialogChoose
             // 
@@ -214,7 +215,7 @@
         private System.Windows.Forms.Button choose_demo;
         private System.Windows.Forms.OpenFileDialog fileDialogChoose;
         private System.Windows.Forms.Button button_parseJSON;
-        private System.Windows.Forms.Button logdelete;
+        private System.Windows.Forms.Button logclear;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.RichTextBox errorbox;
         private System.Windows.Forms.FlowLayoutPanel errorLayout;

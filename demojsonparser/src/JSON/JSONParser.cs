@@ -39,6 +39,7 @@ namespace demojsonparser.src.JSON
                 f = Formatting.Indented;
 
             outputStream.Write(JsonConvert.SerializeObject(gs, f));
+            //gs = null;
         }
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace demojsonparser.src.JSON
         public void stopParser()
         {
             outputStream.Close();
+            parser = null;
         }
 
 
