@@ -10,13 +10,11 @@ using DemoInfo;
 using Newtonsoft.Json;
 using demojsonparser.src.JSON.objects;
 using demojsonparser.src.JSON.events;
-using demojsonparser.src.logging;
 
 namespace demojsonparser.src
 {
     public class GameStateGenerator
     {
-        //public static Logger logger = new Logger("Logging started");
 
         private const int positioninterval = 8;
 
@@ -118,6 +116,10 @@ namespace demojsonparser.src
 
             };
 
+            parser.FreezetimeEnded += (object sender, FreezetimeEndedEventArgs e) =>
+            {
+                hasFreeezEnded = true; //Just capture movement after freezetime has ended
+            };
 
 
             parser.WeaponFired += (object sender, WeaponFiredEventArgs we) =>
@@ -245,6 +247,7 @@ namespace demojsonparser.src
             };
             #endregion
 
+            #region Futureevents
             /*
             //Extraevents maybe useful
             parser.RoundFinal += (object sender, RoundFinalEventArgs e) => {
@@ -260,18 +263,17 @@ namespace demojsonparser.src
 
             };
             */
+            #endregion
 
-            parser.FreezetimeEnded += (object sender, FreezetimeEndedEventArgs e) =>
-            {
-                hasFreeezEnded = true; //Just capture movement after freezetime has ended
-            };
+
 
             //Assemble a tick object with the above gameevents
             parser.TickDone += (sender, e) =>
             {
                 if (!hasMatchStarted) //Dont count ticks if the game has not started already (dismissing warmup and knife-phase for official matches)
                     return;
-                // Every tick save id and time
+
+
                 // Dumb playerpositions every positioninterval-ticks when freezetime has ended
                 if ((tick_id % positioninterval == 0) && hasFreeezEnded)
                     foreach (var player in parser.PlayingParticipants)
@@ -282,39 +284,39 @@ namespace demojsonparser.src
                 tick_id++;
             };
 
-            //Parse tickwise and add the resulting tick to the round object
-            bool hasnext = true;
-            while (hasnext)
-            {
-                try
-                {
-                    hasnext = parser.ParseNextTick();
-                }
-                catch (System.IO.EndOfStreamException e)
-                {
-                    sv.getErrorBox().AppendText("Problem with tickparsing. Is your .dem valid? See this projects github page for more info.\n");
-                    sv.getErrorBox().AppendText("Stacktrace: " + e.StackTrace+ "\n");
-                    jsonparser.stopParser();
-                    watch.Stop();
-                    break;
-                }
 
-                if (hasRoundStarted)
+
+            try
+            {
+                //Parse tickwise and add the resulting tick to the round object
+                while (parser.ParseNextTick())
                 {
-                    tick.tick_id = tick_id;
-                    if (tick.tickevents.Count != 0)
+                    if (hasRoundStarted)
                     {
-                        //When something happend during the tick(more than 0 events)
-                        round.ticks.Add(tick);
-                        tick = new JSONTick();
-                        tick.tickevents = new List<JSONGameevent>();
-                    } /*else
+                        tick.tick_id = tick_id;
+                        //Tickevents were registered
+                        if (tick.tickevents.Count != 0)
+                        {
+                            round.ticks.Add(tick);
+                            tick = new JSONTick();
+                            tick.tickevents = new List<JSONGameevent>();
+                        } /*else
                         {
                             round.ticks.Add(nulltick); // Add empty ticks !! Creates useless data and wastes memory
                         } */
-                }
+                    }
 
+                }
             }
+            catch (System.IO.EndOfStreamException e)
+            {
+                sv.getErrorBox().AppendText("Problem with tick-parsing. Is your .dem valid? See this projects github page for more info.\n");
+                sv.getErrorBox().AppendText("Stacktrace: " + e.StackTrace + "\n");
+                jsonparser.stopParser();
+                watch.Stop();
+            }
+
+
 
             //Dump the complete gamestate object into JSON-file and do not pretty print(memory expensive)
             jsonparser.dump(gs, false);
@@ -322,6 +324,7 @@ namespace demojsonparser.src
             //Work is done.
             jsonparser.stopParser();
 
+            //try to collect garbage
             gs = null;
             match = null;
             round = null;
@@ -334,7 +337,7 @@ namespace demojsonparser.src
             var elapsedMs = watch.ElapsedMilliseconds;
             var sec = elapsedMs / 1000.0f;
             sv.getErrorBox().AppendText("Time to parse: " + path + ": " + sec + "sec. \n");
-            sv.getErrorBox().AppendText("You can find your .json in the same path. \n");
+            sv.getErrorBox().AppendText("You can find the corresponding JSON at the same path. \n");
         }
 
         public static void setView(StartView nsv)

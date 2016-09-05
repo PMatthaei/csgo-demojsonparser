@@ -23,10 +23,15 @@ namespace demojsonparser
             headline.BackColor = Color.FromArgb(45, Color.Black);
             errorLayout.BackColor = Color.FromArgb(45, Color.Black);
             
+            //Provide view to generator for information about generation process
             GameStateGenerator.setView(this);
 
         }
 
+        /// <summary>
+        /// Access errorbox outside startview class for feedback about performance, state or errors
+        /// </summary>
+        /// <returns></returns>
         public RichTextBox getErrorBox()
         {
             return errorbox;
@@ -57,11 +62,9 @@ namespace demojsonparser
 
         }
 
-
         private void logclear_Click(object sender, EventArgs e)
         {
             errorbox.Clear();
-
         }
     }
 }

@@ -166,13 +166,13 @@
             this.label2.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.label2.Location = new System.Drawing.Point(3, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(99, 20);
+            this.label2.Size = new System.Drawing.Size(40, 20);
             this.label2.TabIndex = 4;
-            this.label2.Text = "Error logging";
+            this.label2.Text = "Log:";
             // 
             // logclear
             // 
-            this.logclear.Location = new System.Drawing.Point(108, 3);
+            this.logclear.Location = new System.Drawing.Point(49, 3);
             this.logclear.Name = "logclear";
             this.logclear.Size = new System.Drawing.Size(162, 22);
             this.logclear.TabIndex = 3;
