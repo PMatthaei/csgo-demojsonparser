@@ -7,7 +7,7 @@ using demojsonparser.src.JSON.objects.subobjects;
 
 namespace demojsonparser.src.JSON.objects
 {
-    class JSONPlayer
+    public class JSONPlayer
     {
         public string playername { get; set; }
         public int player_id { get; set; }

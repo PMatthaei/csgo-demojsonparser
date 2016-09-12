@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace demojsonparser.src.JSON.objects
 {
-    class JSONGamestate
+    public class JSONGamestate
     {
         public JSONGamemeta meta { get; set; }
         public JSONMatch match { get; set; }

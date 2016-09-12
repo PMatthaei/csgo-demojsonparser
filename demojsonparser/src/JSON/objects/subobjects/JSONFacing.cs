@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace demojsonparser.src.JSON.objects.subobjects
 {
-    class JSONFacing
+    public class JSONFacing
     {
         public float yaw { get; set; }
         public float pitch { get; set; }

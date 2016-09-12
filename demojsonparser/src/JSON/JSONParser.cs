@@ -19,7 +19,7 @@ namespace demojsonparser.src.JSON
         private static StreamWriter outputStream;
         private DemoParser parser;
 
-        enum PlayerType {META, NORMAL, DETAILED, WITHEQUIPMENT };
+        enum PlayerType { META, NORMAL, DETAILED, WITHEQUIPMENT };
 
         public JSONParser(DemoParser parser, string path)
         {
@@ -40,6 +40,19 @@ namespace demojsonparser.src.JSON
 
             outputStream.Write(JsonConvert.SerializeObject(gs, f));
             //gs = null;
+        }
+
+        /// <summary>
+        /// Dumps gamestate in a string
+        /// </summary>
+        /// <param name="gs"></param>
+        /// <param name="prettyjson"></param>
+        public string dumpToString(JSONGamestate gs, bool prettyjson)
+        {
+            Formatting f = Formatting.None;
+            if (prettyjson)
+                f = Formatting.Indented;
+            return JsonConvert.SerializeObject(gs, f);
         }
 
         /// <summary>
@@ -183,7 +196,7 @@ namespace demojsonparser.src.JSON
 
 
         #region SUBEVENTS
-        
+
         public List<JSONPlayer> assemblePlayers(Player[] ps)
         {
             if (ps == null)
@@ -229,7 +242,7 @@ namespace demojsonparser.src.JSON
                 team = p.Team.ToString(),
                 clanname = p.AdditionaInformations.Clantag,
                 steam_id = p.SteamID,
-                position = new JSONPosition3D { x = 0 , y = 0, z = 0 },
+                position = new JSONPosition3D { x = 0, y = 0, z = 0 },
                 facing = new JSONFacing { yaw = 0, pitch = 0 }
             };
             return player;

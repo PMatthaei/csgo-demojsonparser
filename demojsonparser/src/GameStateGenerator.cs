@@ -18,6 +18,10 @@ namespace demojsonparser.src
 
         private const int positioninterval = 8;
 
+        private static JSONParser jsonparser;
+
+        private static System.Diagnostics.Stopwatch watch;
+
         private static StartView sv;
         //
         //
@@ -28,19 +32,66 @@ namespace demojsonparser.src
         //          5) Add missing events(jumping, stepping, bombdefuse site)
         //
 
-
-
+        /// <summary>
+        /// Writes the gamestate to a JSON file at the same path
+        /// </summary>
+        /// <param name="parser"></param>
+        /// <param name="path"></param>
         public static void GenerateJSONFile(DemoParser parser, string path)
+        {
+            var gs = GenerateGamestate(parser, path);
+
+            //Dump the complete gamestate object into JSON-file and do not pretty print(memory expensive)
+            jsonparser.dump(gs, sv.getCheckPretty());
+
+            //Work is done.
+            jsonparser.stopParser();
+
+            //try to collect garbage
+            gs = null;
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            //Fancy calculations and feedback for 10/10 user reviews.
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            var sec = elapsedMs / 1000.0f;
+            sv.getErrorBox().AppendText("Time to parse: " + path + ": " + sec + "sec. \n");
+            sv.getErrorBox().AppendText("You can find the corresponding JSON at the same path. \n");
+        }
+
+        /// <summary>
+        /// Returns a string of the serialized gamestate object
+        /// </summary>
+        public static string GenerateJSONString(DemoParser parser, string path)
+        {
+            var gs = GenerateGamestate(parser, path);
+            return jsonparser.dumpToString(gs, false);
+        }
+
+        /// <summary>
+        /// Assembles the gamestate object from data given by the demoparser.
+        /// </summary>
+        /// <param name="parser"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static JSONGamestate GenerateGamestate(DemoParser parser, string path)
         {
 
             //Measure time to roughly check performance
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            if(watch == null)
+            {
+                watch = System.Diagnostics.Stopwatch.StartNew();
+            } else
+            {
+                watch.Restart();
+            }
 
-            //TODO: Check why/how GC is not grabbing the gamestate if these are within GenerateJSONFile()
+            //TODO: Check why/how GC is not grabbing the gamestate if these are NOT within GenerateJSONFile()
             JSONMatch match = new JSONMatch();
             JSONRound round = new JSONRound();
             JSONTick tick = new JSONTick();
-            JSONParser jsonparser;
             JSONGamestate gs;
 
             //JSONTick nulltick = new JSONTick(); //Just for testing or if empty ticks are wanted
@@ -319,27 +370,8 @@ namespace demojsonparser.src
             }
 
 
+            return gs;
 
-            //Dump the complete gamestate object into JSON-file and do not pretty print(memory expensive)
-            jsonparser.dump(gs, sv.getCheckPretty());
-
-            //Work is done.
-            jsonparser.stopParser();
-
-            //try to collect garbage
-            gs = null;
-            match = null;
-            round = null;
-            tick = null;
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
-            watch.Stop();
-            var elapsedMs = watch.ElapsedMilliseconds;
-            var sec = elapsedMs / 1000.0f;
-            sv.getErrorBox().AppendText("Time to parse: " + path + ": " + sec + "sec. \n");
-            sv.getErrorBox().AppendText("You can find the corresponding JSON at the same path. \n");
         }
 
         public static void setView(StartView nsv)
