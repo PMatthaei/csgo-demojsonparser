@@ -35,11 +35,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxChoose = new System.Windows.Forms.TextBox();
             this.choose_demo = new System.Windows.Forms.Button();
-            this.button_parseJSON = new System.Windows.Forms.Button();
             this.errorbox = new System.Windows.Forms.RichTextBox();
             this.errorLayout = new System.Windows.Forms.FlowLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
             this.logclear = new System.Windows.Forms.Button();
+            this.button_parseJSON = new System.Windows.Forms.Button();
+            this.prettyjson_checkBox = new System.Windows.Forms.CheckBox();
             this.fileDialogChoose = new System.Windows.Forms.OpenFileDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.tableLayoutPanel1.SuspendLayout();
@@ -56,9 +57,9 @@
             this.headline.BackColor = System.Drawing.Color.DimGray;
             this.headline.Font = new System.Drawing.Font("Calibri", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.headline.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.headline.Location = new System.Drawing.Point(246, 0);
+            this.headline.Location = new System.Drawing.Point(245, 0);
             this.headline.Name = "headline";
-            this.headline.Size = new System.Drawing.Size(842, 80);
+            this.headline.Size = new System.Drawing.Size(841, 80);
             this.headline.TabIndex = 0;
             this.headline.Text = "CS:GO-Demo to JSON Parser";
             this.headline.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -73,12 +74,13 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.2848F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.7152F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 172F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 174F));
             this.tableLayoutPanel1.Controls.Add(this.headline, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.chooseLayout, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.button_parseJSON, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.errorbox, 1, 5);
             this.tableLayoutPanel1.Controls.Add(this.errorLayout, 1, 4);
+            this.tableLayoutPanel1.Controls.Add(this.button_parseJSON, 1, 3);
+            this.tableLayoutPanel1.Controls.Add(this.prettyjson_checkBox, 1, 2);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 6;
@@ -97,10 +99,10 @@
             this.chooseLayout.Controls.Add(this.label1);
             this.chooseLayout.Controls.Add(this.textBoxChoose);
             this.chooseLayout.Controls.Add(this.choose_demo);
-            this.chooseLayout.Location = new System.Drawing.Point(246, 83);
+            this.chooseLayout.Location = new System.Drawing.Point(245, 83);
             this.chooseLayout.Name = "chooseLayout";
             this.chooseLayout.Padding = new System.Windows.Forms.Padding(10, 10, 0, 0);
-            this.chooseLayout.Size = new System.Drawing.Size(842, 43);
+            this.chooseLayout.Size = new System.Drawing.Size(841, 43);
             this.chooseLayout.TabIndex = 1;
             // 
             // label1
@@ -131,21 +133,11 @@
             this.choose_demo.UseVisualStyleBackColor = true;
             this.choose_demo.Click += new System.EventHandler(this.choose_demo_Click);
             // 
-            // button_parseJSON
-            // 
-            this.button_parseJSON.Location = new System.Drawing.Point(246, 132);
-            this.button_parseJSON.Name = "button_parseJSON";
-            this.button_parseJSON.Size = new System.Drawing.Size(842, 51);
-            this.button_parseJSON.TabIndex = 2;
-            this.button_parseJSON.Text = "Parse .dem to GameState JSON";
-            this.button_parseJSON.UseVisualStyleBackColor = true;
-            this.button_parseJSON.Click += new System.EventHandler(this.button_parseJSON_Click);
-            // 
             // errorbox
             // 
-            this.errorbox.Location = new System.Drawing.Point(246, 279);
+            this.errorbox.Location = new System.Drawing.Point(245, 279);
             this.errorbox.Name = "errorbox";
-            this.errorbox.Size = new System.Drawing.Size(842, 390);
+            this.errorbox.Size = new System.Drawing.Size(841, 390);
             this.errorbox.TabIndex = 5;
             this.errorbox.Text = "";
             // 
@@ -154,9 +146,9 @@
             this.errorLayout.BackColor = System.Drawing.Color.DimGray;
             this.errorLayout.Controls.Add(this.label2);
             this.errorLayout.Controls.Add(this.logclear);
-            this.errorLayout.Location = new System.Drawing.Point(246, 242);
+            this.errorLayout.Location = new System.Drawing.Point(245, 242);
             this.errorLayout.Name = "errorLayout";
-            this.errorLayout.Size = new System.Drawing.Size(842, 31);
+            this.errorLayout.Size = new System.Drawing.Size(841, 31);
             this.errorLayout.TabIndex = 6;
             // 
             // label2
@@ -179,6 +171,27 @@
             this.logclear.Text = "Clear log";
             this.logclear.UseVisualStyleBackColor = true;
             this.logclear.Click += new System.EventHandler(this.logclear_Click);
+            // 
+            // button_parseJSON
+            // 
+            this.button_parseJSON.Location = new System.Drawing.Point(245, 189);
+            this.button_parseJSON.Name = "button_parseJSON";
+            this.button_parseJSON.Size = new System.Drawing.Size(841, 47);
+            this.button_parseJSON.TabIndex = 2;
+            this.button_parseJSON.Text = "Parse .dem to GameState JSON";
+            this.button_parseJSON.UseVisualStyleBackColor = true;
+            this.button_parseJSON.Click += new System.EventHandler(this.button_parseJSON_Click);
+            // 
+            // prettyjson_checkBox
+            // 
+            this.prettyjson_checkBox.AutoSize = true;
+            this.prettyjson_checkBox.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.prettyjson_checkBox.Location = new System.Drawing.Point(245, 132);
+            this.prettyjson_checkBox.Name = "prettyjson_checkBox";
+            this.prettyjson_checkBox.Size = new System.Drawing.Size(270, 17);
+            this.prettyjson_checkBox.TabIndex = 3;
+            this.prettyjson_checkBox.Text = "Use pretty print json (only recommended for visibility)";
+            this.prettyjson_checkBox.UseVisualStyleBackColor = true;
             // 
             // fileDialogChoose
             // 
@@ -220,6 +233,7 @@
         private System.Windows.Forms.RichTextBox errorbox;
         private System.Windows.Forms.FlowLayoutPanel errorLayout;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.CheckBox prettyjson_checkBox;
     }
 }
 

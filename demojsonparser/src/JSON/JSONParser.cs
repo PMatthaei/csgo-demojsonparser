@@ -171,8 +171,9 @@ namespace demojsonparser.src.JSON
             return new JSONBomb
             {
                 gameevent = gameevent,
-                haskit = bde.HasKit,
-                player = assemblePlayer(bde.Player)
+                site = 'x',
+                player = assemblePlayer(bde.Player),
+                haskit = bde.HasKit
             };
         }
         #endregion
@@ -227,8 +228,9 @@ namespace demojsonparser.src.JSON
                 player_id = p.EntityID,
                 team = p.Team.ToString(),
                 clanname = p.AdditionaInformations.Clantag,
-                steam_id = p.SteamID
-            
+                steam_id = p.SteamID,
+                position = new JSONPosition3D { x = 0 , y = 0, z = 0 },
+                facing = new JSONFacing { yaw = 0, pitch = 0 }
             };
             return player;
         }

@@ -24,6 +24,8 @@ namespace demojsonparser.src
         // TODO:    1) use de-/serialization and streams for less GC and memory consumption?
         //          2) build json object-oriented with markers (#round1) to paste corresponding string
         //          3) Why are DemoInfo objects kept after using statement? (in StartView.cs)
+        //          4) Build up MVC or similar
+        //          5) Add missing events(jumping, stepping, bombdefuse site)
         //
 
 
@@ -319,7 +321,7 @@ namespace demojsonparser.src
 
 
             //Dump the complete gamestate object into JSON-file and do not pretty print(memory expensive)
-            jsonparser.dump(gs, false);
+            jsonparser.dump(gs, sv.getCheckPretty());
 
             //Work is done.
             jsonparser.stopParser();
