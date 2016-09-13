@@ -10,6 +10,7 @@ using DemoInfo;
 using Newtonsoft.Json;
 using demojsonparser.src.JSON.objects;
 using demojsonparser.src.JSON.events;
+using System.Diagnostics;
 
 namespace demojsonparser.src
 {
@@ -20,9 +21,10 @@ namespace demojsonparser.src
 
         private static JSONParser jsonparser;
 
-        private static System.Diagnostics.Stopwatch watch;
-
         private static StartView sv;
+
+        private static Stopwatch watch;
+
         //
         //
         // TODO:    1) use de-/serialization and streams for less GC and memory consumption?
@@ -78,15 +80,7 @@ namespace demojsonparser.src
         /// <returns></returns>
         public static JSONGamestate GenerateGamestate(DemoParser parser, string path)
         {
-
-            //Measure time to roughly check performance
-            if(watch == null)
-            {
-                watch = System.Diagnostics.Stopwatch.StartNew();
-            } else
-            {
-                watch.Restart();
-            }
+            initWatch();
 
             //TODO: Check why/how GC is not grabbing the gamestate if these are NOT within GenerateJSONFile()
             JSONMatch match = new JSONMatch();
@@ -372,6 +366,21 @@ namespace demojsonparser.src
 
             return gs;
 
+        }
+
+        /// <summary>
+        /// Measure time to roughly check performance
+        /// </summary>
+        private static void initWatch()
+        {
+            if (watch == null)
+            {
+                watch = System.Diagnostics.Stopwatch.StartNew();
+            }
+            else
+            {
+                watch.Restart();
+            }
         }
 
         public static void setView(StartView nsv)
