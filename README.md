@@ -4,7 +4,7 @@ Feed a valid* .dem and he will spit out a valid json containing information abou
 
 This is a JSONParser using the following format : [Click here](https://github.com/PMatthaei/demojsonparser-csgo/blob/master/JSONFORMAT.md)
 
-Data about the CS:GO demos is parsed from bytecode by:
+Data from CS:GO demos (.dem) is parsed with a modified version of:
 
 DemoInfo - https://github.com/StatsHelix/demoinfo
 
