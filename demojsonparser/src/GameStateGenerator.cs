@@ -20,24 +20,29 @@ namespace demojsonparser.src
 
         private static JSONParser jsonparser;
 
-        private static StartView sv;
 
-
-        //Helper variables
+        /// <summary>
+        /// Used to check if a players position was already caught by an event. If not perform a positon update in TickDone
+        /// </summary>
         private static List<Player> steppers = new List<Player>();
+
+        /// <summary>
+        /// Interval at which positionupdates are displayed in a tick
+        /// </summary>
+        private const int positioninterval = 8;
 
         private static Stopwatch watch;
 
-        private const int positioninterval = 8;
 
         //
         //
         // TODO:    1) use de-/serialization and streams for less GC and memory consumption?
-        //          2) build json object-oriented with markers (#round1) to paste corresponding string
         //          3) Why are DemoInfo objects kept after using statement? (in StartView.cs)
         //          4) Build up MVC or similar
-        //          5) Add missing event - bombdefuse abort and begin are missing the value of site(no key?)
-        //          6) Improve code near jsonparser - too many functions for similar tasks(see player)
+        //          6) Improve code around jsonparser - too many functions for similar tasks(see player/playerdetailed/withitems)
+        //          7) isducking never returns true
+        //          8) implement bomb dropped and pickup events if necessary in DemoInfoModded
+        //          9) gui communication - dont pass gui object with setter etc!!
         //
 
         /// <summary>
@@ -50,7 +55,7 @@ namespace demojsonparser.src
             var gs = GenerateGamestate(parser, path);
 
             //Dump the complete gamestate object into JSON-file and do not pretty print(memory expensive)
-            jsonparser.dumpJSONFile(gs, sv.getCheckPretty());
+            jsonparser.dumpJSONFile(gs, false);
 
             //Work is done.
             jsonparser.stopParser();
@@ -65,8 +70,9 @@ namespace demojsonparser.src
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
             var sec = elapsedMs / 1000.0f;
-            sv.getErrorBox().AppendText("Time to parse: " + path + ": " + sec + "sec. \n");
-            sv.getErrorBox().AppendText("You can find the corresponding JSON at the same path. \n");
+
+            Console.WriteLine("Time to parse: " + path + ": " + sec + "sec. \n");
+            Console.WriteLine("You can find the corresponding JSON at the same path. \n");
         }
 
         /// <summary>
@@ -75,7 +81,7 @@ namespace demojsonparser.src
         public static string GenerateJSONString(DemoParser parser, string path)
         {
             var gs = GenerateGamestate(parser, path);
-            return jsonparser.dumpToString(gs, false);
+            return jsonparser.dumpJSONString(gs, false);
         }
 
         /// <summary>
@@ -389,8 +395,8 @@ namespace demojsonparser.src
             }
             catch (System.IO.EndOfStreamException e)
             {
-                sv.getErrorBox().AppendText("Problem with tick-parsing. Is your .dem valid? See this projects github page for more info.\n");
-                sv.getErrorBox().AppendText("Stacktrace: " + e.StackTrace + "\n");
+                Console.WriteLine("Problem with tick-parsing. Is your .dem valid? See this projects github page for more info.\n");
+                Console.WriteLine("Stacktrace: " + e.StackTrace + "\n");
                 jsonparser.stopParser();
                 watch.Stop();
             }
@@ -424,10 +430,6 @@ namespace demojsonparser.src
             }
         }
 
-        public static void setView(StartView nsv)
-        {
-            sv = nsv;
-        }
     }
 
 }

@@ -49,25 +49,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DemoInfo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=dc7de83c756ec63d, processorArchitecture=MSIL">
-      <HintPath>..\packages\DemoInfo.1.2.0\lib\net45\DemoInfo.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\GameStateGenerator.cs" />
@@ -93,12 +85,6 @@
     <Compile Include="src\JSON\objects\subobjects\JSONFacing.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONItem.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONPosition3D.cs" />
-    <Compile Include="views\StartView.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="views\StartView.Designer.cs">
-      <DependentUpon>StartView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -111,9 +97,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="views\StartView.resx">
-      <DependentUpon>StartView.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -141,9 +124,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\demoinfo-modded\DemoInfoModded\DemoInfoModded\DemoInfoModded.csproj">
+    <ProjectReference Include="..\..\..\demoinfo-modded\DemoInfoModded\DemoInfoModded\demoinfo-modded.csproj">
       <Project>{cc02519d-c604-41da-990a-11a8477c35a4}</Project>
-      <Name>DemoInfoModded</Name>
+      <Name>demoinfo-modded</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -7,7 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "demojsonparser", "demojsonp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "demojsonparser-console", "demojsonparser-console\demojsonparser-console.csproj", "{FD8FDF2C-E75B-49A6-85B9-08F8986291AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoInfoModded", "..\..\demoinfo-modded\DemoInfoModded\DemoInfoModded\DemoInfoModded.csproj", "{CC02519D-C604-41DA-990A-11A8477C35A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "demoinfo-modded", "..\..\demoinfo-modded\DemoInfoModded\DemoInfoModded\demoinfo-modded.csproj", "{CC02519D-C604-41DA-990A-11A8477C35A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "demojsonparser-gui", "demojsonparser-gui\demojsonparser-gui.csproj", "{DE1AF3ED-5076-4707-9325-26FAE8C51FCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{CC02519D-C604-41DA-990A-11A8477C35A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC02519D-C604-41DA-990A-11A8477C35A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC02519D-C604-41DA-990A-11A8477C35A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE1AF3ED-5076-4707-9325-26FAE8C51FCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE1AF3ED-5076-4707-9325-26FAE8C51FCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE1AF3ED-5076-4707-9325-26FAE8C51FCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE1AF3ED-5076-4707-9325-26FAE8C51FCF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

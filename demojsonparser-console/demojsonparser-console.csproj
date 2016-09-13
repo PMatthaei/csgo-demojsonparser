@@ -55,6 +55,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\demoinfo-modded\DemoInfoModded\DemoInfoModded\demoinfo-modded.csproj">
+      <Project>{cc02519d-c604-41da-990a-11a8477c35a4}</Project>
+      <Name>demoinfo-modded</Name>
+    </ProjectReference>
     <ProjectReference Include="..\demojsonparser\demojsonparser.csproj">
       <Project>{1f5e5c98-a49a-4927-87b0-4931b77c7dad}</Project>
       <Name>demojsonparser</Name>

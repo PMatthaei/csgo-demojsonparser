@@ -15,11 +15,12 @@ namespace demojsonparser.src.JSON
     class JSONParser
     {
         enum Eventtype { SMOKENADE, SMOKENADE_ENDED, FLASH, FLASH_ENDED, HEGRENADE, DECOY, DECOY_ENDED };
+        enum PlayerType { META, NORMAL, DETAILED, WITHEQUIPMENT };
 
         private static StreamWriter outputStream;
+
         private DemoParser parser;
 
-        enum PlayerType { META, NORMAL, DETAILED, WITHEQUIPMENT };
 
         public JSONParser(DemoParser parser, string path)
         {
@@ -176,7 +177,7 @@ namespace demojsonparser.src.JSON
             return new JSONBomb
             {
                 gameevent = gameevent,
-                site = 'x',
+                site = bde.Site,
                 player = assemblePlayerDetailed(bde.Player),
                 haskit = bde.HasKit
             };
