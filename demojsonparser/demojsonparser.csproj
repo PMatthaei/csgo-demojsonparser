@@ -37,6 +37,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -77,6 +78,7 @@
     <Compile Include="src\JSON\events\JSONPlayerFootstep.cs" />
     <Compile Include="src\JSON\events\JSONPlayerHurt.cs" />
     <Compile Include="src\JSON\events\JSONPlayerKilled.cs" />
+    <Compile Include="src\JSON\events\JSONPlayerMovement.cs" />
     <Compile Include="src\JSON\events\JSONWeaponFire.cs" />
     <Compile Include="src\JSON\JSONParser.cs" />
     <Compile Include="src\JSON\objects\JSONGamemeta.cs" />
@@ -137,6 +139,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\demoinfo-modded\DemoInfoModded\DemoInfoModded\DemoInfoModded.csproj">
+      <Project>{cc02519d-c604-41da-990a-11a8477c35a4}</Project>
+      <Name>DemoInfoModded</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

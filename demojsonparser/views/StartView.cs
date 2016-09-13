@@ -9,14 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using demojsonparser.src;
-using DemoInfo;
+using DemoInfoModded;
 
 namespace demojsonparser
 {
     public partial class StartView : Form
     {
-        bool usepretty = false;
-
         public StartView()
         {
             InitializeComponent();

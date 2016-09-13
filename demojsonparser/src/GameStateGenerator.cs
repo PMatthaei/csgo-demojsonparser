@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.IO;
 using demojsonparser.src.JSON;
-using DemoInfo;
+using DemoInfoModded;
 using Newtonsoft.Json;
 using demojsonparser.src.JSON.objects;
 using demojsonparser.src.JSON.events;
@@ -17,13 +17,18 @@ namespace demojsonparser.src
     public class GameStateGenerator
     {
 
-        private const int positioninterval = 8;
 
         private static JSONParser jsonparser;
 
         private static StartView sv;
 
+
+        //Helper variables
+        private static List<Player> steppers = new List<Player>();
+
         private static Stopwatch watch;
+
+        private const int positioninterval = 8;
 
         //
         //
@@ -31,7 +36,8 @@ namespace demojsonparser.src
         //          2) build json object-oriented with markers (#round1) to paste corresponding string
         //          3) Why are DemoInfo objects kept after using statement? (in StartView.cs)
         //          4) Build up MVC or similar
-        //          5) Add missing events(jumping, stepping, bombdefuse site)
+        //          5) Add missing event - bombdefuse abort and begin are missing the value of site(no key?)
+        //          6) Improve code near jsonparser - too many functions for similar tasks(see player)
         //
 
         /// <summary>
@@ -44,7 +50,7 @@ namespace demojsonparser.src
             var gs = GenerateGamestate(parser, path);
 
             //Dump the complete gamestate object into JSON-file and do not pretty print(memory expensive)
-            jsonparser.dump(gs, sv.getCheckPretty());
+            jsonparser.dumpJSONFile(gs, sv.getCheckPretty());
 
             //Work is done.
             jsonparser.stopParser();
@@ -174,7 +180,31 @@ namespace demojsonparser.src
                 if (hasMatchStarted)
                     tick.tickevents.Add(jsonparser.assembleWeaponFire(we));
             };
+            #endregion
 
+            #region Player events
+
+            parser.PlayerJumped += (sender, e) =>
+            {
+                if (hasMatchStarted)
+                {
+                    if (e.Jumper != null)
+                        tick.tickevents.Add(jsonparser.assemblePlayerJumped(e));
+                        steppers.Add(e.Jumper);
+                }
+
+            };
+
+            parser.PlayerStepped += (sender, e) =>
+            {
+                if (hasMatchStarted)
+                {
+                    if (e.Stepper != null)
+                        tick.tickevents.Add(jsonparser.assemblePlayerStepped(e));
+                        steppers.Add(e.Stepper);
+                }
+
+            };
 
             parser.PlayerKilled += (object sender, PlayerKilledEventArgs e) =>
             {
@@ -325,10 +355,12 @@ namespace demojsonparser.src
                 if ((tick_id % positioninterval == 0) && hasFreeezEnded)
                     foreach (var player in parser.PlayingParticipants)
                     {
-                        tick.tickevents.Add(jsonparser.assemblePlayerFootstep(player));
+                        if(!checkDoubleSteps(player))
+                            tick.tickevents.Add(jsonparser.assemblePlayerPosition(player));
                     }
 
                 tick_id++;
+                steppers.Clear();
             };
 
 
@@ -368,6 +400,15 @@ namespace demojsonparser.src
 
         }
 
+        /// <summary>
+        /// Check if a players position / footstep is already in this tick to prevent doubles
+        /// </summary>
+        /// <returns></returns>
+        private static bool checkDoubleSteps(Player p)
+        {
+            return steppers.Contains(p);
+        }
+        
         /// <summary>
         /// Measure time to roughly check performance
         /// </summary>

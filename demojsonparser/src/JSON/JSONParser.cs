@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DemoInfo;
+using DemoInfoModded;
 using Newtonsoft.Json;
 using demojsonparser.src.JSON.objects;
 using demojsonparser.src.JSON.events;
@@ -32,14 +32,13 @@ namespace demojsonparser.src.JSON
         /// </summary>
         /// <param name="gs"></param>
         /// <param name="prettyjson"></param>
-        public void dump(JSONGamestate gs, bool prettyjson)
+        public void dumpJSONFile(JSONGamestate gs, bool prettyjson)
         {
             Formatting f = Formatting.None;
             if (prettyjson)
                 f = Formatting.Indented;
 
             outputStream.Write(JsonConvert.SerializeObject(gs, f));
-            //gs = null;
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace demojsonparser.src.JSON
         /// </summary>
         /// <param name="gs"></param>
         /// <param name="prettyjson"></param>
-        public string dumpToString(JSONGamestate gs, bool prettyjson)
+        public string dumpJSONString(JSONGamestate gs, bool prettyjson)
         {
             Formatting f = Formatting.None;
             if (prettyjson)
@@ -55,14 +54,7 @@ namespace demojsonparser.src.JSON
             return JsonConvert.SerializeObject(gs, f);
         }
 
-        /// <summary>
-        /// Dumps a string to the json
-        /// </summary>
-        /// <param name="s"></param>
-        public void dump(string s)
-        {
-            outputStream.Write(s);
-        }
+
 
         public void stopParser()
         {
@@ -114,8 +106,8 @@ namespace demojsonparser.src.JSON
             JSONPlayerHurt ph = new JSONPlayerHurt
             {
                 gameevent = "player_hurt",
-                attacker = assemblePlayer(phe.Attacker),
-                victim = assemblePlayer(phe.Player),
+                attacker = assemblePlayerDetailed(phe.Attacker),
+                victim = assemblePlayerDetailed(phe.Player),
                 armor = phe.Armor,
                 armor_damage = phe.ArmorDamage,
                 HP = phe.Health,
@@ -126,11 +118,11 @@ namespace demojsonparser.src.JSON
             return ph;
         }
 
-        public JSONPlayerFootstep assemblePlayerFootstep(Player p)
+        public JSONPlayerFootstep assemblePlayerPosition(Player p)
         {
             return new JSONPlayerFootstep
             {
-                gameevent = "player_footstep",
+                gameevent = "player_position",
                 player = assemblePlayer(p)
             };
         }
@@ -148,7 +140,7 @@ namespace demojsonparser.src.JSON
                 return new JSONFlashNade
                 {
                     gameevent = eventname,
-                    thrownby = assemblePlayer(e.ThrownBy),
+                    thrownby = assemblePlayerDetailed(e.ThrownBy),
                     nadetype = e.NadeType.ToString(),
                     position = new JSONPosition3D { x = e.Position.X, y = e.Position.Y, z = e.Position.Z },
                     flashedplayers = assemblePlayers(f.FlashedPlayers)
@@ -158,7 +150,7 @@ namespace demojsonparser.src.JSON
             return new JSONNade
             {
                 gameevent = eventname,
-                thrownby = assemblePlayer(e.ThrownBy),
+                thrownby = assemblePlayerDetailed(e.ThrownBy),
                 nadetype = e.NadeType.ToString(),
                 position = new JSONPosition3D { x = e.Position.X, y = e.Position.Y, z = e.Position.Z },
             };
@@ -175,7 +167,7 @@ namespace demojsonparser.src.JSON
             {
                 gameevent = gameevent,
                 site = be.Site,
-                player = assemblePlayer(be.Player)
+                player = assemblePlayerDetailed(be.Player)
             };
         }
 
@@ -185,7 +177,7 @@ namespace demojsonparser.src.JSON
             {
                 gameevent = gameevent,
                 site = 'x',
-                player = assemblePlayer(bde.Player),
+                player = assemblePlayerDetailed(bde.Player),
                 haskit = bde.HasKit
             };
         }
@@ -206,6 +198,24 @@ namespace demojsonparser.src.JSON
                 players.Add(assemblePlayer(player));
 
             return players;
+        }
+
+        internal JSONGameevent assemblePlayerJumped(PlayerJumpedEventArgs e)
+        {
+            return new JSONPlayerMovement
+            {
+                gameevent = "player_jumped",
+                player = assemblePlayerDetailed(e.Jumper)
+            };
+        }
+
+        internal JSONGameevent assemblePlayerStepped(PlayerSteppedEventArgs e)
+        {
+            return new JSONPlayerMovement
+            {
+                gameevent = "player_footstep",
+                player = assemblePlayerDetailed(e.Stepper)
+            };
         }
 
         public List<JSONPlayerMeta> assemblePlayers(IEnumerable<Player> ps)
