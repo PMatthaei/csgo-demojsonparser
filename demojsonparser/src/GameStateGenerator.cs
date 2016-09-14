@@ -17,9 +17,15 @@ namespace demojsonparser.src
     public class GameStateGenerator
     {
 
-
+        /// <summary>
+        /// Parser assembling and disassembling objects later parsed with Newtonsoft.JSON
+        /// </summary>
         private static JSONParser jsonparser;
 
+        /// <summary>
+        /// Current task containg parsing information and data
+        /// </summary>
+        private static ParseTask ptask;
 
         /// <summary>
         /// Used to check if a players position was already caught by an event. If not perform a positon update in TickDone
@@ -42,7 +48,7 @@ namespace demojsonparser.src
         //          6) Improve code around jsonparser - too many functions for similar tasks(see player/playerdetailed/withitems)
         //          7) isducking never returns true
         //          8) implement bomb dropped and pickup events if necessary in DemoInfoModded
-        //          9) gui communication - dont pass gui object with setter etc!!
+        //          9) gui communication - parsing is currently blocking UI update
         //
 
         /// <summary>

@@ -5,8 +5,55 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:demojsonparser_gui"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280">
-    <Grid>
-        
+        Title="CS:GO Demo-2-JSON Parser" Height="720" Width="1280">
+    <Grid Background="#FF343434">
+        <TextBox x:Name="pathBox" HorizontalAlignment="Left" Height="25" Margin="30,95,0,0"  Text=".dem source path(s)" VerticalAlignment="Top" Width="500"/>
+        <Button x:Name="chooseButton" Content="Choose" HorizontalAlignment="Center" Margin="0,95,0,0" VerticalAlignment="Top" Height="25" Width="150" Click="OnChooseSrcClick"/>
+        <Label x:Name="label" Foreground="White" Content="CS:GO DEMOJSONPARSER" HorizontalAlignment="Center" Margin="0,20,0,0" VerticalAlignment="Top" FontSize="36" FontFamily="Segoe WP Black"/>
+        <TabControl x:Name="tabControl" HorizontalAlignment="Left" Height="250" Margin="30,0,0,20" VerticalAlignment="Bottom" Width="500">
+            <TabItem Header="OPTIONS">
+                <Grid Background="White" Margin="0,0,0,0">
+                    <CheckBox x:Name="prettyCheckBox" Content="Pretty print json" HorizontalAlignment="Left" Margin="25,25,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="stepsCheckBox" Content="Show steps" HorizontalAlignment="Left" Margin="25,50,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="specialCheckBox" Content="Show special events(bomb lost, bomb pickup)" HorizontalAlignment="Left" Margin="25,75,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="precisionCheckBox" Content="Use highly detailed data about player(Defuser,Velocity,Items)" HorizontalAlignment="Left" Margin="25,100,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="stepintervalCheckBox" Content="Interval(in ticks) with which position updates are captured" HorizontalAlignment="Left" Margin="25,125,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="alternateTextBox" HorizontalAlignment="Left" Height="24" Margin="25,150,0,0"  Text="Alternate destination path" VerticalAlignment="Top" Width="200"/>
+                    <Button x:Name="buttonChooseAlt" Content="Choose" HorizontalAlignment="Left" Margin="245,150,0,0" VerticalAlignment="Top" Width="100" Height="25" Click="OnChooseDestClick"/>
+                    <Label x:Name="labelHint" Content="Otherwise .json will be dropped in the source path of .dem" HorizontalAlignment="Left" Margin="25,170,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="textBox" HorizontalAlignment="Right" Height="20" Margin="0,122,100,0" Text="8" VerticalAlignment="Top" Width="20"/>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+        <TabControl x:Name="tabControl1" HorizontalAlignment="Right" Height="531" Margin="0,130,30,0" VerticalAlignment="Top" Width="500">
+            <TabItem Header="Eventlog">
+                <Grid Background="White">
+                    <RichTextBox x:Name="eventlog" HorizontalAlignment="Left" Height="503" VerticalAlignment="Top" Width="494" Background="#FFF9EBDC">
+                        <FlowDocument>
+                            <Paragraph>
+                                <Run Text=""/>
+                            </Paragraph>
+                        </FlowDocument>
+                    </RichTextBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button x:Name="button" Content="Parse .dem to .json" HorizontalAlignment="Center" Margin="0,0,0,300" VerticalAlignment="Center" Height="50" Width="150" Click="OnParseClick"/>
+        <TabControl x:Name="tabControl2" HorizontalAlignment="Left" Height="276" Margin="30,130,0,0" VerticalAlignment="Top" Width="500">
+            <TabItem Header="CHOOSEN FILES:">
+                <Grid Background="White">
+                    <ListView x:Name="ChoosenListView" HorizontalAlignment="Left" Height="250" VerticalAlignment="Top" Width="495" MouseDoubleClick="OnDoubleClickSelect">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn x:Name="filename" Width="150" Header="FileName" DisplayMemberBinding="{Binding FileName}" />
+                                <GridViewColumn x:Name="filepath" Width="345" Header="FilePath" DisplayMemberBinding="{Binding FilePath}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
     </Grid>
 </Window>

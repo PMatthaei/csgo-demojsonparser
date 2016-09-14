@@ -87,6 +87,7 @@
     <Compile Include="src\JSON\objects\subobjects\JSONPosition3D.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\JSON\ParseTask.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -124,8 +125,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\demoinfo-modded\DemoInfoModded\DemoInfoModded\demoinfo-modded.csproj">
-      <Project>{cc02519d-c604-41da-990a-11a8477c35a4}</Project>
+    <ProjectReference Include="..\..\..\demoinfo-modded\DemoInfoModded\demoinfo-modded\demoinfo-modded.csproj">
+      <Project>{859f0c7d-a7d5-4209-abae-3140a70c7afb}</Project>
       <Name>demoinfo-modded</Name>
     </ProjectReference>
   </ItemGroup>
