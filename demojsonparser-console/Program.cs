@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DemoInfoModded;
 using demojsonparser.src;
+using demojsonparser.src.JSON;
 
 namespace demojsonparser_console
 {
@@ -32,7 +33,19 @@ namespace demojsonparser_console
                     {
                         using (var demoparser = new DemoParser(File.OpenRead(path))) //Force garbage collection since outputstream of the parser cannot be changed
                         {
+                            ParseTask p = new ParseTask
+                            {
+                                destpath = path,
+                                srcpath = path,
+                                usepretty = false,
+                                showsteps = true,
+                                specialevents = true,
+                                highdetailplayer = true,
+                                positioninterval = 8
+                            };
+
                             GameStateGenerator.GenerateJSONFile(demoparser, path);
+
                             Console.WriteLine("Press Q and ENTER to Quit");
                             string input = Console.ReadLine();
                             while (input != "q")
@@ -55,9 +68,9 @@ namespace demojsonparser_console
             {
                 Console.WriteLine("Error: ");
                 Console.WriteLine(e.Message);
-                Console.WriteLine("Commandline arguments missing? Closing in 4seconds.");
+                Console.WriteLine("Commandline arguments missing? Closing in 10seconds.");
 
-                System.Threading.Thread.Sleep(4000);
+                System.Threading.Thread.Sleep(10000);
             }
 
         }

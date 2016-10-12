@@ -87,7 +87,13 @@ namespace demojsonparser_gui
 
         private void OnParseClick(object sender, RoutedEventArgs e)
         {
-
+            var selectedItem = (DemoListEntry)ChoosenListView.SelectedItem;
+            if(selectedItem != null)
+            {
+                parseSelectedItem(selectedItem);
+                return;
+            }
+            
             for (int i = items.Count - 1; i >= 0; i--)
             {
                 var parseEntry = items[i];
@@ -103,10 +109,11 @@ namespace demojsonparser_gui
                         usepretty = prettyCheckBox.IsChecked.Value,
                         showsteps = stepsCheckBox.IsChecked.Value,
                         specialevents = specialCheckBox.IsChecked.Value,
-                        highdetailplayer = precisionCheckBox.IsChecked.Value
+                        highdetailplayer = precisionCheckBox.IsChecked.Value,
+                        positioninterval = Int32.Parse(poscount.Text)
                     };
 
-                    GameStateGenerator.GenerateJSONFile(parser, parseEntry.FilePath);
+                    GameStateGenerator.GenerateJSONFile(parser, p);
 
                     eventlog.AppendText("Parsing was successful!\n");
                     eventlog.ScrollToEnd();
@@ -129,6 +136,11 @@ namespace demojsonparser_gui
         {
             var selectedItem = (DemoListEntry)ChoosenListView.SelectedItem;
 
+            parseSelectedItem(selectedItem);
+        }
+
+        private void parseSelectedItem(DemoListEntry selectedItem)
+        {
             if (selectedItem == null)
             {
                 eventlog.AppendText("No item selected\n");
@@ -136,7 +148,7 @@ namespace demojsonparser_gui
             }
 
             DemoListEntry d = selectedItem;
-            eventlog.AppendText("Start parsing selected item: " + d.FileName+ "\n");
+            eventlog.AppendText("Start parsing selected item: " + d.FileName + "\n");
 
             using (var parser = new DemoParser(File.OpenRead(d.FilePath)))
             {
@@ -159,6 +171,5 @@ namespace demojsonparser_gui
                 ChoosenListView.Items.Refresh();
             }
         }
-
     }
 }

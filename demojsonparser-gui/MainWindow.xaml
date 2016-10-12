@@ -21,13 +21,13 @@
                     <TextBox x:Name="alternateTextBox" HorizontalAlignment="Left" Height="24" Margin="25,150,0,0"  Text="Alternate destination path" VerticalAlignment="Top" Width="200"/>
                     <Button x:Name="buttonChooseAlt" Content="Choose" HorizontalAlignment="Left" Margin="245,150,0,0" VerticalAlignment="Top" Width="100" Height="25" Click="OnChooseDestClick"/>
                     <Label x:Name="labelHint" Content="Otherwise .json will be dropped in the source path of .dem" HorizontalAlignment="Left" Margin="25,170,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="textBox" HorizontalAlignment="Right" Height="20" Margin="0,122,100,0" Text="8" VerticalAlignment="Top" Width="20"/>
+                    <TextBox x:Name="poscount" HorizontalAlignment="Right" Height="20" Margin="0,122,100,0" Text="8" VerticalAlignment="Top" Width="20"/>
                 </Grid>
             </TabItem>
 
         </TabControl>
         <TabControl x:Name="tabControl1" HorizontalAlignment="Right" Height="531" Margin="0,130,30,0" VerticalAlignment="Top" Width="500">
-            <TabItem Header="Eventlog">
+            <TabItem Header="EVENTLOG">
                 <Grid Background="White">
                     <RichTextBox x:Name="eventlog" HorizontalAlignment="Left" Height="503" VerticalAlignment="Top" Width="494" Background="#FFF9EBDC">
                         <FlowDocument>
@@ -39,7 +39,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button x:Name="button" Content="Parse .dem to .json" HorizontalAlignment="Center" Margin="0,0,0,300" VerticalAlignment="Center" Height="50" Width="150" Click="OnParseClick"/>
+        <Button x:Name="button" Content="Parse .dem to .json" HorizontalAlignment="Center" Margin="0,0,0,300" VerticalAlignment="Center" Height="50" Width="200" Click="OnParseClick"/>
         <TabControl x:Name="tabControl2" HorizontalAlignment="Left" Height="276" Margin="30,130,0,0" VerticalAlignment="Top" Width="500">
             <TabItem Header="CHOOSEN FILES:">
                 <Grid Background="White">

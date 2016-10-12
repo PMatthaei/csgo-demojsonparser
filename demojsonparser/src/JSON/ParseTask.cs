@@ -12,13 +12,18 @@ namespace demojsonparser.src.JSON
     /// </summary>
     public class ParseTask
     {
-        public DemoParser parser { get; set; }
         public string srcpath { get; set; }
+
         public string destpath { get; set; }
 
         public bool usepretty { get; set; }
+
         public bool showsteps { get; set; }
+
+        public int positioninterval { get; set; }
+
         public bool specialevents { get; set; }
+
         public bool highdetailplayer { get; set; }
     }
 }
