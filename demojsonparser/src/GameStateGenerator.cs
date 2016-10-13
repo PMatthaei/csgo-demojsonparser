@@ -27,10 +27,6 @@ namespace demojsonparser.src
         /// </summary>
         private static ParseTask ptask;
 
-        /// <summary>
-        /// Interval at which positionupdates are displayed in a tick
-        /// </summary>
-        private const int positioninterval = 8;
 
 
         private static Stopwatch watch;
@@ -52,13 +48,14 @@ namespace demojsonparser.src
         /// </summary>
         /// <param name="parser"></param>
         /// <param name="path"></param>
-        public static void GenerateJSONFile(DemoParser parser, string srcpath)
+        public static void GenerateJSONFile(DemoParser demoparser, ParseTask newtask)
         {
+            ptask = newtask;
 
-            var gs = GenerateGamestate(parser, srcpath);
+            var gs = GenerateGamestate(demoparser);
 
             //Dump the complete gamestate object into JSON-file and do not pretty print(memory expensive)
-            jsonparser.dumpJSONFile(gs, false);
+            jsonparser.dumpJSONFile(gs, ptask.usepretty);
 
             //Work is done.
             jsonparser.stopParser();
@@ -80,12 +77,12 @@ namespace demojsonparser.src
         /// <summary>
         /// Returns a string of the serialized gamestate object
         /// </summary>
-        public static string GenerateJSONString(DemoParser parser, ParseTask newtask)
+        public static string GenerateJSONString(DemoParser demoparser, ParseTask newtask)
         {
             ptask = newtask;
 
-            var gs = GenerateGamestate(parser, ptask.srcpath);
-            string gsstr = jsonparser.dumpJSONString(gs, false);
+            var gs = GenerateGamestate(demoparser);
+            string gsstr = jsonparser.dumpJSONString(gs, ptask.usepretty);
 
             jsonparser.stopParser();
 
@@ -110,7 +107,7 @@ namespace demojsonparser.src
         /// <param name="parser"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static JSONGamestate GenerateGamestate(DemoParser parser, string path)
+        public static JSONGamestate GenerateGamestate(DemoParser parser)
         {
 
             initWatch();
@@ -131,6 +128,8 @@ namespace demojsonparser.src
             bool hasRoundStarted = false;
             bool hasFreeezEnded = false;
 
+            int positioninterval = ptask.positioninterval;
+
             int tick_id = 0;
             int round_id = 0;
 
@@ -139,7 +138,7 @@ namespace demojsonparser.src
             //
 
             //Parser to transform DemoParser events to JSON format
-            jsonparser = new JSONParser(parser, path);
+            jsonparser = new JSONParser(ptask.destpath);
 
             //Init lists
             match.rounds = new List<JSONRound>();
@@ -156,7 +155,7 @@ namespace demojsonparser.src
             {
                 hasMatchStarted = true;
                 //Assign Gamemetadata
-                gs.meta = jsonparser.assembleGamemeta();
+                gs.meta = jsonparser.assembleGamemeta(parser.Map, parser.TickRate, parser.PlayingParticipants);
             };
 
             //Assign match object
@@ -387,7 +386,7 @@ namespace demojsonparser.src
                 {
                     foreach (var player in parser.PlayingParticipants)
                     {
-                        if (!checkDoubleSteps(player, steppers))
+                        if (!checkDoubleSteps(player, steppers)) // Check if we already measured a position update of a player(by jump or step event)
                             tick.tickevents.Add(jsonparser.assemblePlayerPosition(player));
                     }
                 }

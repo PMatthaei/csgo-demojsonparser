@@ -14,20 +14,16 @@ namespace demojsonparser.src.JSON
 {
     class JSONParser
     {
-        enum Eventtype { SMOKENADE, SMOKENADE_ENDED, FLASH, FLASH_ENDED, HEGRENADE, DECOY, DECOY_ENDED };
-        enum PlayerType { META, NORMAL, DETAILED, WITHEQUIPMENT };
 
         private static StreamWriter outputStream;
 
-        private DemoParser parser;
 
-
-        public JSONParser(DemoParser parser, string path)
+        public JSONParser(string path)
         {
-            this.parser = parser;
             string outputpath = path.Replace(".dem", "") + ".json";
             outputStream = new StreamWriter(outputpath);
         }
+
         /// <summary>
         /// Dumps the Gamestate in prettyjson or as one-liner(default)
         /// </summary>
@@ -60,21 +56,20 @@ namespace demojsonparser.src.JSON
         public void stopParser()
         {
             outputStream.Close();
-            parser = null;
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
 
 
-        public JSONGamemeta assembleGamemeta()
+        public JSONGamemeta assembleGamemeta(string mapname, float tickrate, IEnumerable<Player> players)
         {
             return new JSONGamemeta
             {
                 gamestate_id = 0,
-                mapname = parser.Map,
-                tickrate = parser.TickRate,
-                players = assemblePlayers(parser.PlayingParticipants),
+                mapname = mapname,
+                tickrate = tickrate,
+                players = assemblePlayers(players),
             };
         }
 

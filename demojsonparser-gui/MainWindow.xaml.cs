@@ -124,14 +124,6 @@ namespace demojsonparser_gui
             }
         }
 
-        public class DemoListEntry
-        {
-            public string FileName { get; set; }
-
-            public string FilePath { get; set; }
-
-        }
-
         private void OnDoubleClickSelect(object sender, MouseButtonEventArgs e)
         {
             var selectedItem = (DemoListEntry)ChoosenListView.SelectedItem;
@@ -150,6 +142,9 @@ namespace demojsonparser_gui
             DemoListEntry d = selectedItem;
             eventlog.AppendText("Start parsing selected item: " + d.FileName + "\n");
 
+            if (!Directory.Exists(alternateTextBox.Text))
+                alternateTextBox.Text = d.FilePath.Replace(d.FileName,""); //Fails with multiple occurencies of filename in path (who does this?)
+
             using (var parser = new DemoParser(File.OpenRead(d.FilePath)))
             {
                 ParseTask p = new ParseTask
@@ -159,10 +154,11 @@ namespace demojsonparser_gui
                     usepretty = prettyCheckBox.IsChecked.Value,
                     showsteps = stepsCheckBox.IsChecked.Value,
                     specialevents = specialCheckBox.IsChecked.Value,
-                    highdetailplayer = precisionCheckBox.IsChecked.Value
+                    highdetailplayer = precisionCheckBox.IsChecked.Value,
+                    positioninterval = Int32.Parse(poscount.Text)
                 };
 
-                GameStateGenerator.GenerateJSONFile(parser, d.FilePath);
+                GameStateGenerator.GenerateJSONFile(parser, p);
 
                 eventlog.AppendText("Parsing was successful!\n");
                 eventlog.ScrollToEnd();
@@ -170,6 +166,14 @@ namespace demojsonparser_gui
                 ChoosenListView.ItemsSource = items;
                 ChoosenListView.Items.Refresh();
             }
+        }
+
+        public class DemoListEntry
+        {
+            public string FileName { get; set; }
+
+            public string FilePath { get; set; }
+
         }
     }
 }

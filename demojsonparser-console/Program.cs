@@ -31,7 +31,9 @@ namespace demojsonparser_console
                 {
                     if (File.Exists(path))
                     {
-                        using (var demoparser = new DemoParser(File.OpenRead(path))) //Force garbage collection since outputstream of the parser cannot be changed
+                        Console.WriteLine("Start parsing: "+ path);
+
+                        using (var demoparser = new DemoParser(File.OpenRead(path)))
                         {
                             ParseTask p = new ParseTask
                             {
@@ -44,14 +46,10 @@ namespace demojsonparser_console
                                 positioninterval = 8
                             };
 
-                            GameStateGenerator.GenerateJSONFile(demoparser, path);
+                            GameStateGenerator.GenerateJSONFile(demoparser, p);
 
-                            Console.WriteLine("Press Q and ENTER to Quit");
-                            string input = Console.ReadLine();
-                            while (input != "q")
-                            {
-                                input = Console.ReadLine();
-                            }
+                            Console.WriteLine("Any key to Quit");
+                            Console.ReadLine();
                             System.Environment.Exit(1);
 
                         }
@@ -68,7 +66,7 @@ namespace demojsonparser_console
             {
                 Console.WriteLine("Error: ");
                 Console.WriteLine(e.Message);
-                Console.WriteLine("Commandline arguments missing? Closing in 10seconds.");
+                Console.WriteLine("Commandline arguments missing? Closing in 10 seconds.");
 
                 System.Threading.Thread.Sleep(10000);
             }
