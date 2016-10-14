@@ -56,9 +56,6 @@ namespace demojsonparser.src.JSON
         public void stopParser()
         {
             outputStream.Close();
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
         }
 
 

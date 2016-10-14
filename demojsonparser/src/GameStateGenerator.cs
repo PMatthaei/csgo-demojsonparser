@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using demojsonparser.src.JSON.objects;
 using demojsonparser.src.JSON.events;
 using System.Diagnostics;
+using System.Threading;
 
 namespace demojsonparser.src
 {
@@ -27,21 +28,68 @@ namespace demojsonparser.src
         /// </summary>
         private static ParseTask ptask;
 
-
-
         private static Stopwatch watch;
 
+        //
+        // JSON Objects for Serialization
+        //
+        static JSONMatch match;
+        static JSONRound round;
+        static JSONTick tick;
+        static JSONGamestate gs; //JSON holding the whole gamestate - delete this with GC to prevent unnecessary RAM usage!!
 
+
+        //
+        // Helping variables
+        //
+        static List<Player> steppers;
+
+        static bool hasMatchStarted = false;
+        static bool hasRoundStarted = false;
+        static bool hasFreeezEnded = false;
+
+        static int positioninterval = 8;
+
+        static int tick_id = 0;
+        static int round_id = 0;
+
+        static int tickcount = 0;
+
+        //
+        //
+        //
         //
         //
         // TODO:    1) use de-/serialization and streams for less GC and memory consumption?
-        //          3) Why are DemoInfo objects kept after using statement? (in StartView.cs)
-        //          4) Build up MVC or similar
         //          6) Improve code around jsonparser - too many functions for similar tasks(see player/playerdetailed/withitems)
         //          7) isducking never returns true
         //          8) implement bomb dropped and pickup events if necessary in DemoInfoModded
         //          9) gui communication - parsing is currently blocking UI update AND error handling missing(feedback again)
         //
+
+        /// <summary>
+        /// Initializes the generator or resets it if a demo was parser before
+        /// </summary>
+        private static void initialize()
+        {
+            match = new JSONMatch();
+            round = new JSONRound();
+            tick = new JSONTick();
+            gs = new JSONGamestate();
+
+            steppers = new List<Player>();
+
+            hasMatchStarted = false;
+            hasRoundStarted = false;
+            hasFreeezEnded = false;
+
+            positioninterval = 8;
+
+            tick_id = 0;
+            round_id = 0;
+
+            tickcount = 0;
+        }
 
         /// <summary>
         /// Writes the gamestate to a JSON file at the same path
@@ -50,28 +98,27 @@ namespace demojsonparser.src
         /// <param name="path"></param>
         public static void GenerateJSONFile(DemoParser demoparser, ParseTask newtask)
         {
-            ptask = newtask;
+            initialize();
 
-            var gs = GenerateGamestate(demoparser);
+            ptask = newtask;
+            positioninterval = ptask.positioninterval;
+
+            GenerateGamestate(demoparser);
+
+            /*for (int i = 0; i < demoparser.TickRate; i++)
+            {
+                ThreadPool.QueueUserWorkItem(GenerateGamestate, i);
+
+            }*/
 
             //Dump the complete gamestate object into JSON-file and do not pretty print(memory expensive)
             jsonparser.dumpJSONFile(gs, ptask.usepretty);
 
+            printWatch();
+
             //Work is done.
-            jsonparser.stopParser();
+            cleanUp();
 
-            gs = null;
-
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
-            //Fancy calculations and feedback for 10/10 user reviews.
-            watch.Stop();
-            var elapsedMs = watch.ElapsedMilliseconds;
-            var sec = elapsedMs / 1000.0f;
-
-            Console.WriteLine("Time to parse: " + ptask.srcpath + ": " + sec + "sec. \n");
-            Console.WriteLine("You can find the corresponding JSON at the same path. \n");
         }
 
         /// <summary>
@@ -79,24 +126,17 @@ namespace demojsonparser.src
         /// </summary>
         public static string GenerateJSONString(DemoParser demoparser, ParseTask newtask)
         {
-            ptask = newtask;
+            initialize();
 
-            var gs = GenerateGamestate(demoparser);
+            ptask = newtask;
+            positioninterval = ptask.positioninterval;
+
+            GenerateGamestate(demoparser); // Fills variable gs with gamestateobject
             string gsstr = jsonparser.dumpJSONString(gs, ptask.usepretty);
 
-            jsonparser.stopParser();
+            printWatch();
 
-            gs = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
-            //Fancy calculations and feedback for 10/10 user reviews.
-            watch.Stop();
-            var elapsedMs = watch.ElapsedMilliseconds;
-            var sec = elapsedMs / 1000.0f;
-
-            Console.WriteLine("Time to parse: " + ptask.srcpath + ": " + sec + "sec. \n");
-            Console.WriteLine("You can find the corresponding JSON at the same path. \n");
+            cleanUp();
 
             return gsstr;
         }
@@ -112,30 +152,6 @@ namespace demojsonparser.src
 
             initWatch();
 
-            JSONMatch match = new JSONMatch();
-            JSONRound round = new JSONRound();
-            JSONTick tick = new JSONTick();
-
-            //JSON holding the whole gamestate - delete this with GC to prevent unnecessary RAM usage
-            JSONGamestate gs = new JSONGamestate();
-
-            //
-            // Helping variables
-            //
-            List<Player> steppers = new List<Player>();
-
-            bool hasMatchStarted = false;
-            bool hasRoundStarted = false;
-            bool hasFreeezEnded = false;
-
-            int positioninterval = ptask.positioninterval;
-
-            int tick_id = 0;
-            int round_id = 0;
-
-            //
-            //
-            //
 
             //Parser to transform DemoParser events to JSON format
             jsonparser = new JSONParser(ptask.destpath);
@@ -213,14 +229,14 @@ namespace demojsonparser.src
             #endregion
 
             #region Player events
-            
+
             parser.PlayerJumped += (sender, e) =>
             {
                 if (hasMatchStarted)
                 {
                     if (e.Jumper != null)
                         tick.tickevents.Add(jsonparser.assemblePlayerJumped(e));
-                        steppers.Add(e.Jumper);
+                    steppers.Add(e.Jumper);
                 }
 
             };
@@ -231,7 +247,7 @@ namespace demojsonparser.src
                 {
                     if (e.Stepper != null)
                         tick.tickevents.Add(jsonparser.assemblePlayerStepped(e));
-                        steppers.Add(e.Stepper);
+                    steppers.Add(e.Stepper);
                 }
 
             };
@@ -373,7 +389,7 @@ namespace demojsonparser.src
             #endregion
 
 
-
+            #region Tickevent / Ticklogic
             //Assemble a tick object with the above gameevents
             parser.TickDone += (sender, e) =>
             {
@@ -410,13 +426,15 @@ namespace demojsonparser.src
                         if (tick.tickevents.Count != 0)
                         {
                             round.ticks.Add(tick);
+                            tickcount++;
                             tick = new JSONTick();
                             tick.tickevents = new List<JSONGameevent>();
                         }
                     }
 
                 }
-                Console.WriteLine("ticks: "+ tick_id+"\n");
+                Console.WriteLine("Parsed ticks: " + tick_id + "\n");
+                Console.WriteLine("NOT empty ticks: " + tickcount + "\n");
 
             }
             catch (System.IO.EndOfStreamException e)
@@ -426,11 +444,17 @@ namespace demojsonparser.src
                 jsonparser.stopParser();
                 watch.Stop();
             }
-
+            #endregion
 
             return gs;
 
         }
+
+        //
+        //
+        // HELPING FUNCTIONS
+        //
+        //
 
         /// <summary>
         /// Check if a players position / footstep is already in this tick to prevent doubles
@@ -440,7 +464,7 @@ namespace demojsonparser.src
         {
             return steppers.Contains(p);
         }
-        
+
         /// <summary>
         /// Measure time to roughly check performance
         /// </summary>
@@ -456,6 +480,25 @@ namespace demojsonparser.src
             }
         }
 
+        private static void printWatch()
+        {
+            //Fancy calculations and feedback for 10/10 user reviews.
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            var sec = elapsedMs / 1000.0f;
+
+            Console.WriteLine("Time to parse: " + ptask.srcpath + ": " + sec + "sec. \n");
+            Console.WriteLine("You can find the corresponding JSON at the same path. \n");
+        }
+
+        private static void cleanUp()
+        {
+            jsonparser.stopParser();
+            ptask = null;
+            gs = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
     }
 
 }

@@ -39,7 +39,7 @@ namespace demojsonparser_console
                             {
                                 destpath = path,
                                 srcpath = path,
-                                usepretty = false,
+                                usepretty = true,
                                 showsteps = true,
                                 specialevents = true,
                                 highdetailplayer = true,
@@ -48,19 +48,20 @@ namespace demojsonparser_console
 
                             GameStateGenerator.GenerateJSONFile(demoparser, p);
 
-                            Console.WriteLine("Any key to Quit");
-                            Console.ReadLine();
-                            System.Environment.Exit(1);
-
                         }
 
                     }
                     else
                     {
                         Console.WriteLine("Path: " + path + "does not exist");
-                        Console.WriteLine("Demofile will be skipped");
+                        Console.WriteLine("Demofile will be skipped.");
                     }
                 }
+
+                Console.WriteLine("Any key to Quit");
+                Console.ReadLine();
+                System.Environment.Exit(1);
+
             }
             catch (Exception e)
             {
