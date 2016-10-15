@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace demojsonparser.src.JSON.objects
 {
-    public class JSONPlayerMeta : JSONPlayer
+    public class JSONPlayerMeta
     {
+        public string playername { get; set; }
+        public int player_id { get; set; }
+        public string team { get; set; }
         public string clanname { get; set; }
         public long steam_id { get; set; }
     }

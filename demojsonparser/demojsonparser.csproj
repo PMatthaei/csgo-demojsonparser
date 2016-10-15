@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\GameStateGenerator.cs" />
+    <Compile Include="src\JSON\events\JSONBombState.cs" />
     <Compile Include="src\JSON\events\JSONBomb.cs" />
     <Compile Include="src\JSON\events\JSONFlashNade.cs" />
     <Compile Include="src\JSON\events\JSONGameevent.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="src\JSON\objects\subobjects\JSONPlayer.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONPlayerDetailed.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONPlayerDetailedWithItems.cs" />
+    <Compile Include="src\JSON\objects\subobjects\JSONPlayerFlashed.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONPlayerMeta.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONFacing.cs" />
     <Compile Include="src\JSON\objects\subobjects\JSONItem.cs" />

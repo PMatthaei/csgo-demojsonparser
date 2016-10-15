@@ -100,6 +100,9 @@ namespace demojsonparser_gui
                 eventlog.AppendText("Start parsing: " + parseEntry.FilePath + " !\n");
                 eventlog.ScrollToEnd();
 
+                if (!Directory.Exists(alternateTextBox.Text))
+                    alternateTextBox.Text = parseEntry.FilePath.Replace(parseEntry.FileName, ""); //Fails with multiple occurencies of filename in path (who does this?)
+
                 using (var parser = new DemoParser(File.OpenRead(parseEntry.FilePath)))
                 {
                     ParseTask p = new ParseTask

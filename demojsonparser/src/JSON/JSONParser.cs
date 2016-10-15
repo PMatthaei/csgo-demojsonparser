@@ -139,7 +139,7 @@ namespace demojsonparser.src.JSON
                     thrownby = assemblePlayerDetailed(e.ThrownBy),
                     nadetype = e.NadeType.ToString(),
                     position = new JSONPosition3D { x = e.Position.X, y = e.Position.Y, z = e.Position.Z },
-                    flashedplayers = assemblePlayers(f.FlashedPlayers)
+                    flashedplayers = assembleFlashedPlayers(f.FlashedPlayers)
                 };
             }
 
@@ -163,6 +163,24 @@ namespace demojsonparser.src.JSON
             {
                 gameevent = gameevent,
                 site = be.Site,
+                player = assemblePlayerDetailed(be.Player)
+            };
+        }
+
+        public JSONBombState assembleBombState(BombDropEventArgs be, string gameevent)
+        {
+            return new JSONBombState
+            {
+                gameevent = gameevent,
+                player = assemblePlayerDetailed(be.Player)
+            };
+        }
+
+        public JSONBombState assembleBombState(BombPickUpEventArgs be, string gameevent)
+        {
+            return new JSONBombState
+            {
+                gameevent = gameevent,
                 player = assemblePlayerDetailed(be.Player)
             };
         }
@@ -194,6 +212,31 @@ namespace demojsonparser.src.JSON
                 players.Add(assemblePlayer(player));
 
             return players;
+        }
+
+        public List<JSONPlayerFlashed> assembleFlashedPlayers(Player[] ps)
+        {
+            if (ps == null)
+                return null;
+            List<JSONPlayerFlashed> players = new List<JSONPlayerFlashed>();
+            foreach (var player in ps)
+                players.Add(assembleFlashPlayer(player));
+
+            return players;
+        }
+
+        private JSONPlayerFlashed assembleFlashPlayer(Player p)
+        {
+            JSONPlayerFlashed player = new JSONPlayerFlashed
+            {
+                playername = p.Name,
+                player_id = p.EntityID,
+                position = new JSONPosition3D { x = p.Position.X, y = p.Position.Y, z = p.Position.Z },
+                facing = new JSONFacing { yaw = p.ViewDirectionY, pitch = p.ViewDirectionX },
+                team = p.Team.ToString(),
+                flashedduration = p.FlashDuration
+            };
+            return player;
         }
 
         internal JSONGameevent assemblePlayerJumped(PlayerJumpedEventArgs e)
@@ -248,8 +291,6 @@ namespace demojsonparser.src.JSON
                 team = p.Team.ToString(),
                 clanname = p.AdditionaInformations.Clantag,
                 steam_id = p.SteamID,
-                position = new JSONPosition3D { x = 0, y = 0, z = 0 },
-                facing = new JSONFacing { yaw = 0, pitch = 0 }
             };
             return player;
         }
@@ -263,6 +304,7 @@ namespace demojsonparser.src.JSON
                 position = new JSONPosition3D { x = p.Position.X, y = p.Position.Y, z = p.Position.Z },
                 facing = new JSONFacing { yaw = p.ViewDirectionY, pitch = p.ViewDirectionX },
                 team = p.Team.ToString(),
+                isducking = p.IsDucking,
                 hasHelmet = p.HasHelmet,
                 hasdefuser = p.HasDefuseKit,
                 HP = p.HP,
@@ -283,6 +325,7 @@ namespace demojsonparser.src.JSON
                 position = new JSONPosition3D { x = p.Position.X, y = p.Position.Y, z = p.Position.Z },
                 facing = new JSONFacing { yaw = p.ViewDirectionY, pitch = p.ViewDirectionX },
                 team = p.Team.ToString(),
+                isducking = p.IsDucking,
                 hasHelmet = p.HasHelmet,
                 hasdefuser = p.HasDefuseKit,
                 HP = p.HP,
