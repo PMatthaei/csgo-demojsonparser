@@ -97,6 +97,16 @@ namespace demojsonparser.src.JSON
             };
         }
 
+        public JSONWeaponFire assembleWeaponFireEmpty(WeaponFiredEmptyEventArgs we)
+        {
+            return new JSONWeaponFire
+            {
+                gameevent = "weapon_fire_empty",
+                shooter = assemblePlayerDetailed(we.Shooter),
+                weapon = assembleWeapon(we.Weapon)
+            };
+        }
+
         public JSONPlayerHurt assemblePlayerHurt(PlayerHurtEventArgs phe)
         {
             JSONPlayerHurt ph = new JSONPlayerHurt
@@ -248,6 +258,24 @@ namespace demojsonparser.src.JSON
             };
         }
 
+        internal JSONGameevent assemblePlayerFallen(PlayerFallEventArgs e)
+        {
+            return new JSONPlayerMovement
+            {
+                gameevent = "player_fallen",
+                player = assemblePlayerDetailed(e.Fallen)
+            };
+        }
+
+        internal JSONGameevent assembleWeaponReload(WeaponReloadEventArgs we)
+        {
+            return new JSONPlayerMovement
+            {
+                gameevent = "weapon_reload",
+                player = assemblePlayerDetailed(we.Actor)
+            };
+        }
+
         internal JSONGameevent assemblePlayerStepped(PlayerSteppedEventArgs e)
         {
             return new JSONPlayerMovement
@@ -304,9 +332,12 @@ namespace demojsonparser.src.JSON
                 position = new JSONPosition3D { x = p.Position.X, y = p.Position.Y, z = p.Position.Z },
                 facing = new JSONFacing { yaw = p.ViewDirectionY, pitch = p.ViewDirectionX },
                 team = p.Team.ToString(),
-                isducking = p.IsDucking,
+                isDucking = p.IsDucking,
+                isSpotted = p.IsSpotted,
+                isScoped = p.IsScoped,
+                isWalking = p.IsWalking,
                 hasHelmet = p.HasHelmet,
-                hasdefuser = p.HasDefuseKit,
+                hasDefuser = p.HasDefuseKit,
                 HP = p.HP,
                 armor = p.Armor,
                 velocity = p.Velocity.Absolute //Length of Movementvector -> Velocity
@@ -325,9 +356,9 @@ namespace demojsonparser.src.JSON
                 position = new JSONPosition3D { x = p.Position.X, y = p.Position.Y, z = p.Position.Z },
                 facing = new JSONFacing { yaw = p.ViewDirectionY, pitch = p.ViewDirectionX },
                 team = p.Team.ToString(),
-                isducking = p.IsDucking,
+                isDucking = p.IsDucking,
                 hasHelmet = p.HasHelmet,
-                hasdefuser = p.HasDefuseKit,
+                hasDefuser = p.HasDefuseKit,
                 HP = p.HP,
                 armor = p.Armor,
                 velocity = p.Velocity.Absolute, //Length of Movementvector -> Velocity

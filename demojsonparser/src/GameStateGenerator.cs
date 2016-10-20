@@ -65,9 +65,8 @@ namespace demojsonparser.src
         // TODO:    1) use de-/serialization and streams for less GC and memory consumption? - most likely not useful cause string parsing is shitty
         //          6) Improve code around jsonparser - too many functions for similar tasks(see player/playerdetailed/withitems, bomb, nades)
         //          9) gui communication - parsing is currently blocking UI update AND error handling missing(feedback again)
-        //          10) flashedplayers contains players with flashedduration = 0?
         //          11) implement threads?
-        //          12) defuser events? drop pickup?
+        //          12) finish new events
         //
 
         /// <summary>
@@ -168,219 +167,246 @@ namespace demojsonparser.src
         private static void GenerateGamestate()
         {
             #region Main Gameevents
-                //Start writing the gamestate object
-                parser.MatchStarted += (sender, e) =>
-                {
-                    hasMatchStarted = true;
+            //Start writing the gamestate object
+            parser.MatchStarted += (sender, e) =>
+            {
+                hasMatchStarted = true;
                     //Assign Gamemetadata
                     gs.meta = jsonparser.assembleGamemeta(parser.Map, parser.TickRate, parser.PlayingParticipants);
-                };
+            };
 
-                //Assign match object
-                parser.WinPanelMatch += (sender, e) =>
+            //Assign match object
+            parser.WinPanelMatch += (sender, e) =>
+            {
+                if (hasMatchStarted)
+                    gs.match = match;
+                hasMatchStarted = false;
+
+            };
+
+            //Start writing a round object
+            parser.RoundStart += (sender, e) =>
+            {
+                if (hasMatchStarted)
                 {
-                    if (hasMatchStarted)
-                        gs.match = match;
-                    hasMatchStarted = false;
+                    hasRoundStarted = true;
+                    round_id++;
+                    round.round_id = round_id;
+                }
 
-                };
+            };
 
-                //Start writing a round object
-                parser.RoundStart += (sender, e) =>
+            //Add round object to match object
+            parser.RoundEnd += (sender, e) =>
+            {
+                if (hasMatchStarted)
                 {
-                    if (hasMatchStarted)
-                    {
-                        hasRoundStarted = true;
-                        round_id++;
-                        round.round_id = round_id;
-                    }
-
-                };
-
-                //Add round object to match object
-                parser.RoundEnd += (sender, e) =>
-                {
-                    if (hasMatchStarted)
-                    {
-                        if (hasRoundStarted) //TODO: maybe round fires false -> do in tickdone event (see github issues of DemoInfo)
+                    if (hasRoundStarted) //TODO: maybe round fires false -> do in tickdone event (see github issues of DemoInfo)
                         {
-                            round.winner = e.Winner.ToString();
-                            match.rounds.Add(round);
-                            round = new JSONRound();
-                            round.ticks = new List<JSONTick>();
-                        }
-
-                        hasRoundStarted = false;
-
+                        round.winner = e.Winner.ToString();
+                        match.rounds.Add(round);
+                        round = new JSONRound();
+                        round.ticks = new List<JSONTick>();
                     }
 
+                    hasRoundStarted = false;
+
+                }
+
+            };
+
+            parser.FreezetimeEnded += (object sender, FreezetimeEndedEventArgs e) =>
+            {
+                if (hasMatchStarted)
+                    hasFreeezEnded = true; //Just capture movement after freezetime has ended
                 };
 
-                parser.FreezetimeEnded += (object sender, FreezetimeEndedEventArgs e) =>
-                {
-                    if (hasMatchStarted)
-                        hasFreeezEnded = true; //Just capture movement after freezetime has ended
-                };
 
-
-                parser.WeaponFired += (object sender, WeaponFiredEventArgs we) =>
-                {
-                    if (hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleWeaponFire(we));
-                };
-                #endregion
+            #endregion
 
             #region Player events
 
-                parser.PlayerJumped += (sender, e) =>
+            parser.WeaponFired += (object sender, WeaponFiredEventArgs we) =>
+            {
+                if (hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleWeaponFire(we));
+            };
+
+            parser.WeaponReload += (object sender, WeaponReloadEventArgs we) =>
+            {
+                if (hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleWeaponReload(we));
+            };
+
+            parser.WeaponFiredEmpty += (object sender, WeaponFiredEmptyEventArgs we) =>
+            {
+                if (hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleWeaponFireEmpty(we));
+            };
+
+            parser.PlayerJumped += (sender, e) =>
+            {
+                if (hasMatchStarted)
                 {
-                    if (hasMatchStarted)
+                    if (e.Jumper != null)
                     {
-                        if (e.Jumper != null)
-                            tick.tickevents.Add(jsonparser.assemblePlayerJumped(e));
+                        tick.tickevents.Add(jsonparser.assemblePlayerJumped(e));
                         steppers.Add(e.Jumper);
                     }
+                }
 
-                };
+            };
 
-                parser.PlayerStepped += (sender, e) =>
+            parser.PlayerFallen += (sender, e) =>
+            {
+                if (hasMatchStarted)
                 {
-                    if (hasMatchStarted)
+                    if (e.Fallen != null)
                     {
-                        if (e.Stepper != null)
-                            tick.tickevents.Add(jsonparser.assemblePlayerStepped(e));
-                        steppers.Add(e.Stepper);
+                        tick.tickevents.Add(jsonparser.assemblePlayerFallen(e));
                     }
+                }
 
-                };
+            };
 
-                parser.PlayerKilled += (object sender, PlayerKilledEventArgs e) =>
+            parser.PlayerStepped += (sender, e) =>
+            {
+                if (hasMatchStarted)
                 {
-                    if (hasMatchStarted)
-                    {
+                    if (e.Stepper != null)
+                        tick.tickevents.Add(jsonparser.assemblePlayerStepped(e));
+                    steppers.Add(e.Stepper);
+                }
+
+            };
+
+            parser.PlayerKilled += (object sender, PlayerKilledEventArgs e) =>
+            {
+                if (hasMatchStarted)
+                {
                         //the killer is null if vicitm is killed by the world - eg. by falling
                         if (e.Killer != null)
-                            tick.tickevents.Add(jsonparser.assemblePlayerKilled(e));
+                        tick.tickevents.Add(jsonparser.assemblePlayerKilled(e));
 
-                    }
+                }
 
-                };
+            };
 
-                parser.PlayerHurt += (object sender, PlayerHurtEventArgs e) =>
-                {
-                    if (hasMatchStarted)
+            parser.PlayerHurt += (object sender, PlayerHurtEventArgs e) =>
+            {
+                if (hasMatchStarted)
                         //the attacker is null if vicitm is damaged by the world - eg. by falling
                         if (e.Attacker != null)
-                            tick.tickevents.Add(jsonparser.assemblePlayerHurt(e));
-                };
-                #endregion
+                        tick.tickevents.Add(jsonparser.assemblePlayerHurt(e));
+            };
+            #endregion
 
             #region Nadeevents
-                //Nade (Smoke Fire Decoy Flashbang and HE) events
-                parser.ExplosiveNadeExploded += (object sender, GrenadeEventArgs e) =>
-                {
-                    if (e.ThrownBy != null && hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleNade(e, "hegrenade_exploded"));
-                };
+            //Nade (Smoke Fire Decoy Flashbang and HE) events
+            parser.ExplosiveNadeExploded += (object sender, GrenadeEventArgs e) =>
+            {
+                if (e.ThrownBy != null && hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleNade(e, "hegrenade_exploded"));
+            };
 
-                parser.FireNadeStarted += (object sender, FireEventArgs e) =>
-                {
-                    if (e.ThrownBy != null && hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleNade(e, "firenade_exploded"));
-                };
+            parser.FireNadeStarted += (object sender, FireEventArgs e) =>
+            {
+                if (e.ThrownBy != null && hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleNade(e, "firenade_exploded"));
+            };
 
-                parser.FireNadeEnded += (object sender, FireEventArgs e) =>
-                {
-                    if (e.ThrownBy != null && hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleNade(e, "firenade_ended"));
-                };
+            parser.FireNadeEnded += (object sender, FireEventArgs e) =>
+            {
+                if (e.ThrownBy != null && hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleNade(e, "firenade_ended"));
+            };
 
-                parser.SmokeNadeStarted += (object sender, SmokeEventArgs e) =>
-                {
-                    if (e.ThrownBy != null && hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleNade(e, "smoke_exploded"));
-                };
+            parser.SmokeNadeStarted += (object sender, SmokeEventArgs e) =>
+            {
+                if (e.ThrownBy != null && hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleNade(e, "smoke_exploded"));
+            };
 
 
-                parser.SmokeNadeEnded += (object sender, SmokeEventArgs e) =>
-                {
-                    if (e.ThrownBy != null && hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleNade(e, "smoke_ended"));
-                };
+            parser.SmokeNadeEnded += (object sender, SmokeEventArgs e) =>
+            {
+                if (e.ThrownBy != null && hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleNade(e, "smoke_ended"));
+            };
 
-                parser.DecoyNadeStarted += (object sender, DecoyEventArgs e) =>
-                {
-                    if (e.ThrownBy != null && hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleNade(e, "decoy_exploded"));
-                };
+            parser.DecoyNadeStarted += (object sender, DecoyEventArgs e) =>
+            {
+                if (e.ThrownBy != null && hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleNade(e, "decoy_exploded"));
+            };
 
-                parser.DecoyNadeEnded += (object sender, DecoyEventArgs e) =>
-                {
-                    if (e.ThrownBy != null && hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleNade(e, "decoy_ended"));
-                };
+            parser.DecoyNadeEnded += (object sender, DecoyEventArgs e) =>
+            {
+                if (e.ThrownBy != null && hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleNade(e, "decoy_ended"));
+            };
 
-                parser.FlashNadeExploded += (object sender, FlashEventArgs e) =>
-                {
-                    if (e.ThrownBy != null && hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleNade(e, "flash_exploded"));
-                };
-                /*
-                // Seems to be redundant with all exploded events
-                parser.NadeReachedTarget += (object sender, NadeEventArgs e) =>
-                {
-                    if (e.ThrownBy != null && hasMatchStarted)
-                        tick.tickevents.Add(jsonparser.assembleNade(e, "nade_reachedtarget"));
-                }; */
+            parser.FlashNadeExploded += (object sender, FlashEventArgs e) =>
+            {
+                if (e.ThrownBy != null && hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleNade(e, "flash_exploded"));
+            };
+            /*
+            // Seems to be redundant with all exploded events
+            parser.NadeReachedTarget += (object sender, NadeEventArgs e) =>
+            {
+                if (e.ThrownBy != null && hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assembleNade(e, "nade_reachedtarget"));
+            }; */
 
-                #endregion
+            #endregion
 
             #region Bombevents
-                parser.BombAbortPlant += (object sender, BombEventArgs e) =>
-                {
-                    tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_abort_plant"));
-                };
+            parser.BombAbortPlant += (object sender, BombEventArgs e) =>
+            {
+                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_abort_plant"));
+            };
 
-                parser.BombAbortDefuse += (object sender, BombDefuseEventArgs e) =>
-                {
-                    tick.tickevents.Add(jsonparser.assembleBombDefuse(e, "bomb_abort_defuse"));
-                };
+            parser.BombAbortDefuse += (object sender, BombDefuseEventArgs e) =>
+            {
+                tick.tickevents.Add(jsonparser.assembleBombDefuse(e, "bomb_abort_defuse"));
+            };
 
-                parser.BombBeginPlant += (object sender, BombEventArgs e) =>
-                {
-                    tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_begin_plant"));
-                };
+            parser.BombBeginPlant += (object sender, BombEventArgs e) =>
+            {
+                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_begin_plant"));
+            };
 
-                parser.BombBeginDefuse += (object sender, BombDefuseEventArgs e) =>
-                {
-                    tick.tickevents.Add(jsonparser.assembleBombDefuse(e, "bomb_begin_defuse"));
-                };
+            parser.BombBeginDefuse += (object sender, BombDefuseEventArgs e) =>
+            {
+                tick.tickevents.Add(jsonparser.assembleBombDefuse(e, "bomb_begin_defuse"));
+            };
 
-                parser.BombPlanted += (object sender, BombEventArgs e) =>
-                {
-                    tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_planted"));
-                };
+            parser.BombPlanted += (object sender, BombEventArgs e) =>
+            {
+                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_planted"));
+            };
 
-                parser.BombDefused += (object sender, BombEventArgs e) =>
-                {
-                    tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_defused"));
-                };
+            parser.BombDefused += (object sender, BombEventArgs e) =>
+            {
+                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_defused"));
+            };
 
-                parser.BombExploded += (object sender, BombEventArgs e) =>
-                {
-                    tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_exploded"));
-                };
+            parser.BombExploded += (object sender, BombEventArgs e) =>
+            {
+                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_exploded"));
+            };
 
 
-                parser.BombDropped += (object sender, BombDropEventArgs e) =>
-                {
-                    tick.tickevents.Add(jsonparser.assembleBombState(e, "bomb_dropped"));
-                };
+            parser.BombDropped += (object sender, BombDropEventArgs e) =>
+            {
+                tick.tickevents.Add(jsonparser.assembleBombState(e, "bomb_dropped"));
+            };
 
-                parser.BombPicked += (object sender, BombPickUpEventArgs e) =>
-                {
-                    tick.tickevents.Add(jsonparser.assembleBombState(e, "bomb_picked"));
-                };
+            parser.BombPicked += (object sender, BombPickUpEventArgs e) =>
+            {
+                tick.tickevents.Add(jsonparser.assembleBombState(e, "bomb_picked"));
+            };
             #endregion
 
             #region Futureevents
@@ -425,38 +451,38 @@ namespace demojsonparser.src
                 };
 
 
-                try
+            try
+            {
+                //Parse tickwise and add the resulting tick to the round object
+                while (parser.ParseNextTick())
                 {
-                    //Parse tickwise and add the resulting tick to the round object
-                    while (parser.ParseNextTick())
+                    if (hasMatchStarted)
                     {
-                        if (hasMatchStarted)
+                        tick.tick_id = tick_id;
+                        //Tickevents were registered
+                        if (tick.tickevents.Count != 0)
                         {
-                            tick.tick_id = tick_id;
-                            //Tickevents were registered
-                            if (tick.tickevents.Count != 0)
-                            {
-                                round.ticks.Add(tick);
-                                tickcount++;
-                                tick = new JSONTick();
-                                tick.tickevents = new List<JSONGameevent>();
-                            }
+                            round.ticks.Add(tick);
+                            tickcount++;
+                            tick = new JSONTick();
+                            tick.tickevents = new List<JSONGameevent>();
                         }
-
                     }
-                    Console.WriteLine("Parsed ticks: " + tick_id + "\n");
-                    Console.WriteLine("NOT empty ticks: " + tickcount + "\n");
 
                 }
-                catch (System.IO.EndOfStreamException e)
-                {
-                    Console.WriteLine("Problem with tick-parsing. Is your .dem valid? See this projects github page for more info.\n");
-                    Console.WriteLine("Stacktrace: " + e.StackTrace + "\n");
-                    jsonparser.stopParser();
-                    watch.Stop();
-                }
-                #endregion
-            
+                Console.WriteLine("Parsed ticks: " + tick_id + "\n");
+                Console.WriteLine("NOT empty ticks: " + tickcount + "\n");
+
+            }
+            catch (System.IO.EndOfStreamException e)
+            {
+                Console.WriteLine("Problem with tick-parsing. Is your .dem valid? See this projects github page for more info.\n");
+                Console.WriteLine("Stacktrace: " + e.StackTrace + "\n");
+                jsonparser.stopParser();
+                watch.Stop();
+            }
+            #endregion
+
         }
 
 

@@ -67,6 +67,8 @@ namespace demojsonparser_console
             {
                 Console.WriteLine("Error: ");
                 Console.WriteLine(e.Message);
+                Console.WriteLine("Trace: ");
+                Console.WriteLine(e.StackTrace);
                 Console.WriteLine("Commandline arguments missing? Closing in 10 seconds.");
 
                 System.Threading.Thread.Sleep(10000);
