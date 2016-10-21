@@ -232,6 +232,12 @@ namespace demojsonparser.src
                     tick.tickevents.Add(jsonparser.assembleWeaponFire(we));
             };
 
+            parser.PlayerSpotted += (sender, e) =>
+            {
+                if (hasMatchStarted)
+                    tick.tickevents.Add(jsonparser.assemblePlayerSpotted(e));
+            };
+
             parser.WeaponReload += (object sender, WeaponReloadEventArgs we) =>
             {
                 if (hasMatchStarted)
@@ -458,6 +464,7 @@ namespace demojsonparser.src
                 {
                     if (hasMatchStarted)
                     {
+
                         tick.tick_id = tick_id;
                         //Tickevents were registered
                         if (tick.tickevents.Count != 0)
@@ -467,6 +474,7 @@ namespace demojsonparser.src
                             tick = new JSONTick();
                             tick.tickevents = new List<JSONGameevent>();
                         }
+
                     }
 
                 }

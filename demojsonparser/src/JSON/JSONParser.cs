@@ -97,6 +97,15 @@ namespace demojsonparser.src.JSON
             };
         }
 
+        public JSONPlayerMovement assemblePlayerSpotted(PlayerSpottedEventArgs e)
+        {
+            return new JSONPlayerMovement
+            {
+                gameevent = "player_spotted",
+                player = assemblePlayerDetailed(e.player),
+            };
+        }
+
         public JSONWeaponFire assembleWeaponFireEmpty(WeaponFiredEmptyEventArgs we)
         {
             return new JSONWeaponFire
