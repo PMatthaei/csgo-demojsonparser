@@ -1,9 +1,9 @@
 # Demojsonparser
 
 # How to set up
-- Clone this project or download
+- Clone this project or download the zip file
 - Add Json.Net with Nuget Package Manage to all subprojects depending on it
-- Add my forked project of StatsHelix DemoInfo: https://github.com/PMatthaei/demoinfo to all subprojects depending on it
+- Add [my forked project of DemoInfo](https://github.com/PMatthaei/demoinfo) to all subprojects depending on it
 - Build and have fun
 
 # How to use
