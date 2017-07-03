@@ -4,7 +4,7 @@
 - Clone this project or download the zip file
 - Add Json.Net with Nuget Package Manage to all subprojects depending on it
 - Add [my forked project of DemoInfo](https://github.com/PMatthaei/demoinfo) to all subprojects depending on it
-- Build and have fun...if you have problems preserve your fun and see [here]()
+- Build and have fun...if you have problems preserve your fun and see [here](https://github.com/PMatthaei/demojsonparser-csgo/blob/master/SUPPORT.md)
 
 # How to use
 Feed a valid[*] .dem from a CS:GO match and the parser will spit out a valid json containing information about every tick in every round of your game as well as some metadata about it.
