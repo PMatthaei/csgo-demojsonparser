@@ -10,7 +10,10 @@
 Feed a valid[*] .dem from a CS:GO match and the parser will spit out a valid json containing information about every tick in every round of your game as well as some metadata about it.
 
 ## What you get
-This is a JSONParser using the following format : [Click here](https://github.com/PMatthaei/demojsonparser-csgo/blob/master/JSONFORMAT.md)
+This parser is using the following format:
+[Click here](https://github.com/PMatthaei/demojsonparser-csgo/blob/master/JSONFORMAT.md)
+
+[Click here for a sample file ]() ! This file is not valid as it has to be trimmed to upload it here!
 
 ## Credit
 Data from CS:GO demos (.dem) is parsed with a modified version of:
