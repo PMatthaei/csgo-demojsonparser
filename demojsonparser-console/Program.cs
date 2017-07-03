@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DemoInfoModded;
-using demojsonparser.src;
-using demojsonparser.src.JSON;
+using DemoInfo;
+using JSON;
+using Generator;
 
 namespace demojsonparser_console
 {
@@ -31,7 +31,7 @@ namespace demojsonparser_console
                 {
                     if (File.Exists(path))
                     {
-                        Console.WriteLine("Start parsing: "+ path);
+                        Console.WriteLine("Start parsing file: " + path);
 
                         using (var demoparser = new DemoParser(File.OpenRead(path)))
                         {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using demojsonparser.src.JSON.objects;
+using JSON.Objects;
 
-namespace demojsonparser.src.JSON.events
+namespace JSON.Events
 {
     class JSONPlayerFootstep : JSONGameevent
     {

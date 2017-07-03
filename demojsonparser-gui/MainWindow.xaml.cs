@@ -14,9 +14,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Forms;
-using demojsonparser.src;
-using demojsonparser.src.JSON;
-using DemoInfoModded;
+using JSON;
+using DemoInfo;
+using Generator;
 
 namespace demojsonparser_gui
 {

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JSON.Objects;
 
-namespace demojsonparser.src.JSON.events
+namespace JSON.Events
 {
-    public class JSONGameevent
+    public class JSONBombState : JSONGameevent
     {
-        public string gameevent { get; set; }
+        public JSONPlayer player { get; set; }
     }
 }

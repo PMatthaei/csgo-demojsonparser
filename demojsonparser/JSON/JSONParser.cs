@@ -4,13 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DemoInfoModded;
+using DemoInfo;
 using Newtonsoft.Json;
-using demojsonparser.src.JSON.objects;
-using demojsonparser.src.JSON.events;
-using demojsonparser.src.JSON.objects.subobjects;
+using JSON.Objects;
+using JSON.Events;
 
-namespace demojsonparser.src.JSON
+namespace JSON
 {
     class JSONParser
     {
@@ -122,7 +121,7 @@ namespace demojsonparser.src.JSON
             {
                 gameevent = "player_hurt",
                 attacker = assemblePlayerDetailed(phe.Attacker),
-                victim = assemblePlayerDetailed(phe.Player),
+                victim = assemblePlayerDetailed(phe.Victim),
                 armor = phe.Armor,
                 armor_damage = phe.ArmorDamage,
                 HP = phe.Health,
@@ -356,9 +355,9 @@ namespace demojsonparser.src.JSON
         }
 
 
-        public JSONPlayerDetailedWithItems assemblePlayerDetailedWithItems(Player p)
+        public JSONPlayerDetailed assemblePlayerDetailedWithItems(Player p)
         {
-            JSONPlayerDetailedWithItems playerdetailed = new JSONPlayerDetailedWithItems
+            JSONPlayerDetailed playerdetailed = new JSONPlayerDetailed
             {
                 playername = p.Name,
                 player_id = p.EntityID,

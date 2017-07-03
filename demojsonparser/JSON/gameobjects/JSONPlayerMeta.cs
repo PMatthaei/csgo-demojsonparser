@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using demojsonparser.src.JSON.objects.subobjects;
 
-namespace demojsonparser.src.JSON.objects
+namespace JSON.Objects
 {
-    public class JSONPlayer
+    public class JSONPlayerMeta
     {
         public string playername { get; set; }
         public int player_id { get; set; }
         public string team { get; set; }
-        public JSONPosition3D position { get; set; }
-        public JSONFacing facing { get; set; }
+        public string clanname { get; set; }
+        public long steam_id { get; set; }
     }
 }

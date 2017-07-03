@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using demojsonparser.src.JSON.objects;
-using demojsonparser.src.JSON.objects.subobjects;
+using JSON.Objects;
 
-namespace demojsonparser.src.JSON.events
+namespace JSON.Events
 {
     /// <summary>
     /// JSON holding all information needed(supplied) for every nadetype (except flashbangs see JSONFlashNade)

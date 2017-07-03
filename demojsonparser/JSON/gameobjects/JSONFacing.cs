@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace demojsonparser.src.JSON.objects
+namespace JSON.Objects
 {
-    public class JSONMatch
+    public class JSONFacing
     {
-        public List<JSONRound> rounds { get; set; }
+        public float yaw { get; set; }
+        public float pitch { get; set; }
     }
 }

@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FD8FDF2C-E75B-49A6-85B9-08F8986291AA}</ProjectGuid>
+    <ProjectGuid>{D06C37D9-E288-4626-B0BE-F4838016B34E}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>demojsonparser_console</RootNamespace>
@@ -24,7 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,10 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DemoInfo, Version=1.0.0.0, Culture=neutral, PublicKeyToken=dc7de83c756ec63d, processorArchitecture=MSIL">
-      <HintPath>..\packages\DemoInfo.1.2.0\lib\net45\DemoInfo.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -52,12 +48,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\demoinfo-modded\DemoInfoModded\demoinfo-modded\demoinfo-modded.csproj">
-      <Project>{859f0c7d-a7d5-4209-abae-3140a70c7afb}</Project>
-      <Name>demoinfo-modded</Name>
+    <ProjectReference Include="..\..\demoinfo\DemoInfo\DemoInfo.csproj">
+      <Project>{22d4cfc7-6810-4c18-a353-71a49782394f}</Project>
+      <Name>DemoInfo</Name>
     </ProjectReference>
     <ProjectReference Include="..\demojsonparser\demojsonparser.csproj">
       <Project>{1f5e5c98-a49a-4927-87b0-4931b77c7dad}</Project>

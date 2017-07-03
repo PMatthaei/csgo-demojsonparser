@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace demojsonparser.src.JSON.objects
+namespace JSON.Objects
 {
     class JSONPlayerDetailed : JSONPlayer
     {
+        internal List<JSONItem> items;
+
         public int HP { get; set; }
         public int armor { get; set; }
         public bool hasHelmet { get; set; }

@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.IO;
-using demojsonparser.src.JSON;
-using DemoInfoModded;
-using Newtonsoft.Json;
-using demojsonparser.src.JSON.objects;
-using demojsonparser.src.JSON.events;
+using DemoInfo;
+using JSON.Events;
+using JSON;
 using System.Diagnostics;
-using System.Threading;
 
-namespace demojsonparser.src
+namespace Generator
 {
     public class GameStateGenerator
     {
