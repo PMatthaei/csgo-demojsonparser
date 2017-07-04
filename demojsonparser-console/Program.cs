@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DemoInfo;
 using JSON;
-using Generator;
+using GameStateGenerator;
 
 namespace demojsonparser_console
 {
@@ -46,7 +46,7 @@ namespace demojsonparser_console
                                 positioninterval = 8
                             };
 
-                            GameStateGenerator.GenerateJSONFile(demoparser, p);
+                            CSGOGameStateGenerator.GenerateJSONFile(demoparser, p);
 
                         }
 

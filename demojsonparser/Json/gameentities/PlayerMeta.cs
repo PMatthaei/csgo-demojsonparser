@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JSON.Objects
+namespace JSON.Entities
 {
-    public class JSONPlayerMeta
+    public class PlayerMeta
     {
         public string playername { get; set; }
-        public int player_id { get; set; }
         public string team { get; set; }
         public string clanname { get; set; }
         public long steam_id { get; set; }

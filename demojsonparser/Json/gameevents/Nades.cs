@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JSON.Objects;
+using JSON.Entities;
 
 namespace JSON.Events
 {
     /// <summary>
     /// JSON holding all information needed(supplied) for every nadetype (except flashbangs see JSONFlashNade)
     /// </summary>
-    class JSONNade : JSONGameevent
+    class Nades : Gameevent
     {
         public string nadetype { get; set; }
-        public JSONPlayer thrownby { get; set; }
-        public JSONPosition3D position { get; set; }
+        public Player thrownby { get; set; }
+        public Position3D position { get; set; }
+    }
+
+    class FlashNade : Nades
+    {
+        public IList<FlashedPlayer> flashedplayers { get; set; }
     }
 }

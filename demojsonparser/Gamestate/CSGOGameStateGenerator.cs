@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Reflection;
+using System.IO;
 using DemoInfo;
-using JSON.Events;
-using JSON;
+using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Threading;
+using JSON.Events;
+using JSON.Entities;
+using JSON;
 
-namespace Generator
+namespace GameStateGenerator
 {
-    public class GameStateGenerator
+    public class CSGOGameStateGenerator
     {
 
         /// <summary>
@@ -15,6 +23,9 @@ namespace Generator
         /// </summary>
         private static JSONParser jsonparser;
 
+        /// <summary>
+        /// CSGO replay parser
+        /// </summary>
         private static DemoParser parser;
 
         /// <summary>
@@ -22,27 +33,27 @@ namespace Generator
         /// </summary>
         private static ParseTask ptask;
 
-        private static Stopwatch watch;
 
         //
-        // JSON Objects for Serialization
+        //  Objects for JSON-Serialization
         //
-        static JSONMatch match;
-        static JSONRound round;
-        static JSONTick tick;
-        static JSONGamestate gs; //JSON holding the whole gamestate - delete this with GC to prevent unnecessary RAM usage!!
+        static Match match;
+        static Round round;
+        static Tick tick;
+
+        static ReplayGamestate gs; //JSON holding the whole gamestate - delete this with GC to prevent unnecessary RAM usage!!
 
 
         //
         // Helping variables
         //
-        static List<Player> steppers;
+        static List<DemoInfo.Player> alreadytracked;
 
         static bool hasMatchStarted = false;
         static bool hasRoundStarted = false;
         static bool hasFreeezEnded = false;
 
-        static int positioninterval = 8;
+        static int positioninterval; // in ms
 
         static int tick_id = 0;
         static int round_id = 0;
@@ -55,23 +66,28 @@ namespace Generator
         //
         //
         // TODO:    1) use de-/serialization and streams for less GC and memory consumption? - most likely not useful cause string parsing is shitty
-        //          6) Improve code around jsonparser - too many functions for similar tasks(see player/playerdetailed/withitems, bomb, nades)
+        //          6) Improve code around jsonparser - too many functions for similar tasks(see player/playerdetailed/withitems, bomb, nades) -> maybe use anonymous types
         //          9) gui communication - parsing is currently blocking UI update AND error handling missing(feedback again)
         //          11) implement threads?
         //          12) finish new events
         //
 
         /// <summary>
+        /// Watch to measure generation process
+        /// </summary>
+        private static Stopwatch watch;
+
+        /// <summary>
         /// Initializes the generator or resets it if a demo was parser before
         /// </summary>
         private static void initializeGenerator()
         {
-            match = new JSONMatch();
-            round = new JSONRound();
-            tick = new JSONTick();
-            gs = new JSONGamestate();
+            match = new Match();
+            round = new Round();
+            tick = new Tick();
+            gs = new ReplayGamestate();
 
-            steppers = new List<Player>();
+            alreadytracked = new List<DemoInfo.Player>();
 
             hasMatchStarted = false;
             hasRoundStarted = false;
@@ -87,12 +103,12 @@ namespace Generator
             initWatch();
 
             //Parser to transform DemoParser events to JSON format
-            jsonparser = new JSONParser(ptask.destpath);
+            jsonparser = new JSONParser(ptask.destpath, ptask.settings);
 
             //Init lists
-            match.rounds = new List<JSONRound>();
-            round.ticks = new List<JSONTick>();
-            tick.tickevents = new List<JSONGameevent>();
+            match.rounds = new List<Round>();
+            round.ticks = new List<Tick>();
+            tick.tickevents = new List<Gameevent>();
         }
 
         /// <summary>
@@ -106,9 +122,6 @@ namespace Generator
             parser = newdemoparser;
 
             initializeGenerator();
-
-            //Obligatory to use this parser
-            parser.ParseHeader();
 
             GenerateGamestate();
 
@@ -138,10 +151,18 @@ namespace Generator
 
             initializeGenerator();
 
-            parser.ParseHeader();
-
             GenerateGamestate(); // Fills variable gs with gamestateobject
-            string gsstr = jsonparser.dumpJSONString(gs, ptask.usepretty);
+            string gsstr = "";
+            try
+            {
+                gsstr = jsonparser.dumpJSONString(gs, ptask.usepretty);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                Console.ReadLine();
+            }
 
             printWatch();
 
@@ -149,6 +170,19 @@ namespace Generator
 
             return gsstr;
         }
+
+        public static string peakMapname(DemoParser newdemoparser, ParseTask newtask)
+        {
+            ptask = newtask;
+            parser = newdemoparser;
+
+            initializeGenerator();
+
+            parser.ParseHeader();
+
+            return parser.Map;
+        }
+
 
         /// <summary>
         /// Assembles the gamestate object from data given by the demoparser.
@@ -158,13 +192,15 @@ namespace Generator
         /// <returns></returns>
         private static void GenerateGamestate()
         {
+            parser.ParseHeader();
+
             #region Main Gameevents
             //Start writing the gamestate object
             parser.MatchStarted += (sender, e) =>
             {
                 hasMatchStarted = true;
-                    //Assign Gamemetadata
-                    gs.meta = jsonparser.assembleGamemeta(parser.Map, parser.TickRate, parser.PlayingParticipants);
+                //Assign Gamemetadata
+                gs.meta = jsonparser.assembleGamemeta(parser.Map, parser.TickRate, parser.PlayingParticipants);
             };
 
             //Assign match object
@@ -194,11 +230,11 @@ namespace Generator
                 if (hasMatchStarted)
                 {
                     if (hasRoundStarted) //TODO: maybe round fires false -> do in tickdone event (see github issues of DemoInfo)
-                        {
-                        round.winner = e.Winner.ToString();
+                    {
+                        round.winner_team = e.Winner.ToString();
                         match.rounds.Add(round);
-                        round = new JSONRound();
-                        round.ticks = new List<JSONTick>();
+                        round = new Round();
+                        round.ticks = new List<Tick>();
                     }
 
                     hasRoundStarted = false;
@@ -211,12 +247,12 @@ namespace Generator
             {
                 if (hasMatchStarted)
                     hasFreeezEnded = true; //Just capture movement after freezetime has ended
-                };
+            };
 
 
             #endregion
 
-            #region Player events
+            #region Playerevents
 
             parser.WeaponFired += (object sender, WeaponFiredEventArgs we) =>
             {
@@ -233,13 +269,17 @@ namespace Generator
             parser.WeaponReload += (object sender, WeaponReloadEventArgs we) =>
             {
                 if (hasMatchStarted)
-                    tick.tickevents.Add(jsonparser.assembleWeaponReload(we));
+                {
+                    //tick.tickevents.Add(jsonparser.assembleWeaponReload(we));
+                }
             };
 
             parser.WeaponFiredEmpty += (object sender, WeaponFiredEmptyEventArgs we) =>
             {
                 if (hasMatchStarted)
-                    tick.tickevents.Add(jsonparser.assembleWeaponFireEmpty(we));
+                {
+                    //tick.tickevents.Add(jsonparser.assembleWeaponFireEmpty(we));
+                }
             };
 
             parser.PlayerJumped += (sender, e) =>
@@ -248,8 +288,8 @@ namespace Generator
                 {
                     if (e.Jumper != null)
                     {
-                        tick.tickevents.Add(jsonparser.assemblePlayerJumped(e));
-                        steppers.Add(e.Jumper);
+                        //tick.tickevents.Add(jsonparser.assemblePlayerJumped(e));
+                        //steppers.Add(e.Jumper);
                     }
                 }
 
@@ -258,22 +298,21 @@ namespace Generator
             parser.PlayerFallen += (sender, e) =>
             {
                 if (hasMatchStarted)
-                {
                     if (e.Fallen != null)
                     {
-                        tick.tickevents.Add(jsonparser.assemblePlayerFallen(e));
+                        //tick.tickevents.Add(jsonparser.assemblePlayerFallen(e));
                     }
-                }
-
             };
 
             parser.PlayerStepped += (sender, e) =>
             {
                 if (hasMatchStarted)
                 {
-                    if (e.Stepper != null)
+                    if (e.Stepper != null && parser.PlayingParticipants.Contains(e.Stepper))
+                    { //Prevent spectating players from producing steps 
                         tick.tickevents.Add(jsonparser.assemblePlayerStepped(e));
-                    steppers.Add(e.Stepper);
+                        alreadytracked.Add(e.Stepper);
+                    }
                 }
 
             };
@@ -282,10 +321,13 @@ namespace Generator
             {
                 if (hasMatchStarted)
                 {
-                        //the killer is null if vicitm is killed by the world - eg. by falling
-                        if (e.Killer != null)
+                    //the killer is null if vicitm is killed by the world - eg. by falling
+                    if (e.Killer != null)
+                    {
                         tick.tickevents.Add(jsonparser.assemblePlayerKilled(e));
-
+                        alreadytracked.Add(e.Killer);
+                        alreadytracked.Add(e.Victim);
+                    }
                 }
 
             };
@@ -293,31 +335,35 @@ namespace Generator
             parser.PlayerHurt += (object sender, PlayerHurtEventArgs e) =>
             {
                 if (hasMatchStarted)
-                        //the attacker is null if vicitm is damaged by the world - eg. by falling
-                        if (e.Attacker != null)
+                    //the attacker is null if vicitm is damaged by the world - eg. by falling
+                    if (e.Attacker != null)
+                    {
                         tick.tickevents.Add(jsonparser.assemblePlayerHurt(e));
+                        alreadytracked.Add(e.Attacker);
+                        alreadytracked.Add(e.Victim);
+                    }
             };
             #endregion
 
             #region Nadeevents
             //Nade (Smoke Fire Decoy Flashbang and HE) events
             parser.ExplosiveNadeExploded += (object sender, GrenadeEventArgs e) =>
-            {
-                if (e.ThrownBy != null && hasMatchStarted)
-                    tick.tickevents.Add(jsonparser.assembleNade(e, "hegrenade_exploded"));
-            };
+                {
+                    if (e.ThrownBy != null && hasMatchStarted)
+                        tick.tickevents.Add(jsonparser.assembleNade(e, "hegrenade_exploded"));
+                };
 
             parser.FireNadeStarted += (object sender, FireEventArgs e) =>
-            {
-                if (e.ThrownBy != null && hasMatchStarted)
-                    tick.tickevents.Add(jsonparser.assembleNade(e, "firenade_exploded"));
-            };
+                    {
+                        if (e.ThrownBy != null && hasMatchStarted)
+                            tick.tickevents.Add(jsonparser.assembleNade(e, "firenade_exploded"));
+                    };
 
             parser.FireNadeEnded += (object sender, FireEventArgs e) =>
-            {
-                if (e.ThrownBy != null && hasMatchStarted)
-                    tick.tickevents.Add(jsonparser.assembleNade(e, "firenade_ended"));
-            };
+                        {
+                            if (e.ThrownBy != null && hasMatchStarted)
+                                tick.tickevents.Add(jsonparser.assembleNade(e, "firenade_ended"));
+                        };
 
             parser.SmokeNadeStarted += (object sender, SmokeEventArgs e) =>
             {
@@ -362,49 +408,86 @@ namespace Generator
             #region Bombevents
             parser.BombAbortPlant += (object sender, BombEventArgs e) =>
             {
-                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_abort_plant"));
+                //tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_abort_plant"));
             };
 
             parser.BombAbortDefuse += (object sender, BombDefuseEventArgs e) =>
             {
-                tick.tickevents.Add(jsonparser.assembleBombDefuse(e, "bomb_abort_defuse"));
+                //tick.tickevents.Add(jsonparser.assembleBombDefuse(e, "bomb_abort_defuse"));
             };
 
             parser.BombBeginPlant += (object sender, BombEventArgs e) =>
             {
-                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_begin_plant"));
+                //tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_begin_plant"));
             };
 
             parser.BombBeginDefuse += (object sender, BombDefuseEventArgs e) =>
             {
-                tick.tickevents.Add(jsonparser.assembleBombDefuse(e, "bomb_begin_defuse"));
+                //tick.tickevents.Add(jsonparser.assembleBombDefuse(e, "bomb_begin_defuse"));
             };
 
             parser.BombPlanted += (object sender, BombEventArgs e) =>
             {
-                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_planted"));
+                //tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_planted"));
             };
 
             parser.BombDefused += (object sender, BombEventArgs e) =>
             {
-                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_defused"));
+                //tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_defused"));
             };
 
             parser.BombExploded += (object sender, BombEventArgs e) =>
             {
-                tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_exploded"));
+                //tick.tickevents.Add(jsonparser.assembleBomb(e, "bomb_exploded"));
             };
 
 
             parser.BombDropped += (object sender, BombDropEventArgs e) =>
             {
-                tick.tickevents.Add(jsonparser.assembleBombState(e, "bomb_dropped"));
+                //tick.tickevents.Add(jsonparser.assembleBombState(e, "bomb_dropped"));
             };
 
             parser.BombPicked += (object sender, BombPickUpEventArgs e) =>
             {
-                tick.tickevents.Add(jsonparser.assembleBombState(e, "bomb_picked"));
+                //tick.tickevents.Add(jsonparser.assembleBombState(e, "bomb_picked"));
             };
+            #endregion
+
+            #region Serverevents
+
+            parser.PlayerBind += (sender, e) =>
+            {
+                if (hasMatchStarted && parser.PlayingParticipants.Contains(e.Player))
+                {
+                    Console.WriteLine("Tickid: " + tick_id);
+                    tick.tickevents.Add(jsonparser.assemblePlayerBind(e.Player));
+                }
+            };
+
+            parser.PlayerDisconnect += (sender, e) =>
+            {
+                if (hasMatchStarted && parser.PlayingParticipants.Contains(e.Player))
+                {
+                    Console.WriteLine("Tickid: " + tick_id);
+                    tick.tickevents.Add(jsonparser.assemblePlayerDisconnected(e.Player));
+                }
+            };
+
+            parser.BotTakeOver += (sender, e) =>
+            {
+                if (hasMatchStarted && parser.PlayingParticipants.Contains(e.Taker))
+                {
+                    Console.WriteLine("Tickid: " + tick_id);
+                    tick.tickevents.Add(jsonparser.assemblePlayerTakeOver(e));
+                }
+            };
+
+            /*parser.PlayerTeam += (sender, e) =>
+            {
+                if (e.Swapped != null)
+                    Console.WriteLine("Player swapped: " + e.Swapped.Name + " " + e.Swapped.SteamID + " Oldteam: "+ e.OldTeam + " Newteam: " + e.NewTeam +  "IsBot: " + e.IsBot + "Silent: " + e.Silent);
+            };*/
+
             #endregion
 
             #region Futureevents
@@ -425,30 +508,35 @@ namespace Generator
             */
             #endregion
 
+            // TickDone at last!! Otherwise events following this region are not tracked
             #region Tickevent / Ticklogic
             //Assemble a tick object with the above gameevents
             parser.TickDone += (sender, e) =>
+            {
+                if (!hasMatchStarted) //Dont count ticks if the game has not started already (dismissing warmup and knife-phase for official matches)
+                    return;
+
+                // 8 = 250ms, 16 = 500ms usw
+                var updaterate = 8 * (int)(Math.Ceiling(parser.TickRate / 32));
+
+                if (updaterate == 0)
+                   throw new Exception("Updaterate cannot be Zero");
+                // Dump playerpositions every at a given updaterate according to the tickrate
+                if ((tick_id % updaterate == 0) && hasFreeezEnded)
                 {
-                    if (!hasMatchStarted) //Dont count ticks if the game has not started already (dismissing warmup and knife-phase for official matches)
-                        return;
-
-
-                    // Dumb playerpositions every positioninterval-ticks when freezetime has ended
-                    if ((tick_id % positioninterval == 0) && hasFreeezEnded)
+                    foreach (var player in parser.PlayingParticipants.Where(player => !alreadytracked.Contains(player)))
                     {
-                        foreach (var player in parser.PlayingParticipants)
-                        {
-                            if (!checkDoubleSteps(player, steppers)) // Check if we already measured a position update of a player(by jump or step event)
-                                tick.tickevents.Add(jsonparser.assemblePlayerPosition(player));
-                        }
+                        tick.tickevents.Add(jsonparser.assemblePlayerPosition(player));
                     }
+                }
 
+                tick_id++;
+                alreadytracked.Clear();
+            };
 
-                    tick_id++;
-                    steppers.Clear();
-                };
-
-
+            //
+            // MAIN PARSING LOOP
+            //
             try
             {
                 //Parse tickwise and add the resulting tick to the round object
@@ -456,15 +544,14 @@ namespace Generator
                 {
                     if (hasMatchStarted)
                     {
-
                         tick.tick_id = tick_id;
                         //Tickevents were registered
                         if (tick.tickevents.Count != 0)
                         {
                             round.ticks.Add(tick);
                             tickcount++;
-                            tick = new JSONTick();
-                            tick.tickevents = new List<JSONGameevent>();
+                            tick = new Tick();
+                            tick.tickevents = new List<Gameevent>();
                         }
 
                     }
@@ -496,14 +583,6 @@ namespace Generator
         //
         //
 
-        /// <summary>
-        /// Check if a players position / footstep is already in this tick to prevent doubles
-        /// </summary>
-        /// <returns></returns>
-        private static bool checkDoubleSteps(Player p, List<Player> steppers)
-        {
-            return steppers.Contains(p);
-        }
 
         /// <summary>
         /// Measure time to roughly check performance
@@ -531,7 +610,7 @@ namespace Generator
             Console.WriteLine("You can find the corresponding JSON at the same path. \n");
         }
 
-        private static void cleanUp()
+        public static void cleanUp()
         {
             jsonparser.stopParser();
             ptask = null;

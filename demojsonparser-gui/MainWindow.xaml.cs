@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 using System.Windows.Forms;
 using JSON;
 using DemoInfo;
-using Generator;
+using GameStateGenerator;
 
 namespace demojsonparser_gui
 {
@@ -116,7 +116,7 @@ namespace demojsonparser_gui
                         positioninterval = Int32.Parse(poscount.Text)
                     };
 
-                    GameStateGenerator.GenerateJSONFile(parser, p);
+                    CSGOGameStateGenerator.GenerateJSONFile(parser, p);
 
                     eventlog.AppendText("Parsing was successful!\n");
                     eventlog.ScrollToEnd();
@@ -161,7 +161,7 @@ namespace demojsonparser_gui
                     positioninterval = Int32.Parse(poscount.Text)
                 };
 
-                GameStateGenerator.GenerateJSONFile(parser, p);
+                CSGOGameStateGenerator.GenerateJSONFile(parser, p);
 
                 eventlog.AppendText("Parsing was successful!\n");
                 eventlog.ScrollToEnd();

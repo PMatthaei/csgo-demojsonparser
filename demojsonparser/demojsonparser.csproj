@@ -62,33 +62,26 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameStateGenerator.cs" />
-    <Compile Include="JSON\gameevents\JSONBombState.cs" />
-    <Compile Include="JSON\gameevents\JSONBomb.cs" />
-    <Compile Include="JSON\gameevents\JSONFlashNade.cs" />
-    <Compile Include="JSON\gameevents\JSONGameevent.cs" />
-    <Compile Include="JSON\gameevents\JSONNades.cs" />
-    <Compile Include="JSON\gameevents\JSONPlayerFootstep.cs" />
-    <Compile Include="JSON\gameevents\JSONPlayerHurt.cs" />
-    <Compile Include="JSON\gameevents\JSONPlayerKilled.cs" />
-    <Compile Include="JSON\gameevents\JSONPlayerMovement.cs" />
-    <Compile Include="JSON\gameevents\JSONWeaponFire.cs" />
-    <Compile Include="JSON\JSONParser.cs" />
-    <Compile Include="JSON\gamestate\JSONGamemeta.cs" />
-    <Compile Include="JSON\gamestate\JSONGamestate.cs" />
-    <Compile Include="JSON\gamestate\JSONMatch.cs" />
-    <Compile Include="JSON\gamestate\JSONRound.cs" />
-    <Compile Include="JSON\gamestate\JSONTick.cs" />
-    <Compile Include="JSON\gameobjects\JSONPlayer.cs" />
-    <Compile Include="JSON\gameobjects\JSONPlayerDetailed.cs" />
-    <Compile Include="JSON\gameobjects\JSONPlayerFlashed.cs" />
-    <Compile Include="JSON\gameobjects\JSONPlayerMeta.cs" />
-    <Compile Include="JSON\gameobjects\JSONFacing.cs" />
-    <Compile Include="JSON\gameobjects\JSONItem.cs" />
-    <Compile Include="JSON\gameobjects\JSONPosition3D.cs" />
+    <Compile Include="Gamestate\CSGOGameStateGenerator.cs" />
+    <Compile Include="Json\gameevents\Bombs.cs" />
+    <Compile Include="Json\gameevents\Gameevent.cs" />
+    <Compile Include="Json\gameevents\Nades.cs" />
+    <Compile Include="Json\gameevents\PlayerFootstep.cs" />
+    <Compile Include="Json\gameevents\PlayerHurt.cs" />
+    <Compile Include="Json\gameevents\PlayerKilled.cs" />
+    <Compile Include="Json\gameevents\PlayerMovement.cs" />
+    <Compile Include="Json\gameevents\PlayerSpotted.cs" />
+    <Compile Include="Json\gameevents\ServerEvents.cs" />
+    <Compile Include="Json\gameevents\WeaponFire.cs" />
+    <Compile Include="Json\Demo2JsonParser.cs" />
+    <Compile Include="Gamestate\Gamestate.cs" />
+    <Compile Include="Json\gameentities\Player.cs" />
+    <Compile Include="Json\gameentities\DetailedPlayer.cs" />
+    <Compile Include="Json\gameentities\PlayerMeta.cs" />
+    <Compile Include="Json\gameentities\Item.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="JSON\JSONParseTask.cs" />
+    <Compile Include="Json\ParseTask.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

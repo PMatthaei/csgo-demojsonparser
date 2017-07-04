@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JSON.Objects;
+using JSON.Entities;
 
 namespace JSON.Events
 {
-    public class JSONBombState : JSONGameevent
+    class WeaponFire : Gameevent
     {
-        public JSONPlayer player { get; set; }
+        public Player shooter { get; set; }
+        public Item weapon { get; set; }
     }
 }

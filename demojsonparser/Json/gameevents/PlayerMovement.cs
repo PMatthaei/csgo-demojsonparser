@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JSON.Objects;
+using JSON.Entities;
 
 namespace JSON.Events
 {
-    class JSONPlayerFootstep : JSONGameevent
+    class PlayerMovement : Gameevent
     {
-        public JSONPlayer player { get; set; }
+        public DetailedPlayer player { get; set; }
     }
 }

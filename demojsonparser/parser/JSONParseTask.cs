@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+namespace JSONParsing
+{
+    /// <summary>
+    /// Class holding every data on how and where to parse.
+    /// </summary>
+    public class ParseTask
+    {
+        public string srcpath { get; set; }
+
+        public string destpath { get; set; }
+
+        public bool usepretty { get; set; }
+
+        public bool showsteps { get; set; }
+
+        public int positioninterval { get; set; }
+
+        public bool specialevents { get; set; }
+
+        public bool highdetailplayer { get; set; }
+
+        public JsonSerializerSettings settings { get; set; }
+
+    }
+}

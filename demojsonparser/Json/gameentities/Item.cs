@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JSON.Objects
+namespace JSON.Entities
 {
-    class JSONItem
+    class Item
     {
-        public string weapon { get; set; }
-        public int ammoinmagazine { get; set; }
+        internal string name;
+        internal int ammo_in_magazine;
     }
 }

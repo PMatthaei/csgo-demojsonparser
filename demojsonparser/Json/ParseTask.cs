@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace JSON
 {
@@ -11,6 +12,7 @@ namespace JSON
     /// </summary>
     public class ParseTask
     {
+
         /// <summary>
         /// Source of the demo file
         /// </summary>
@@ -45,5 +47,9 @@ namespace JSON
         /// Use highly detailed player data for ouput. Increase filesize!!
         /// </summary>
         public bool highdetailplayer { get; set; }
+
+
+        public JsonSerializerSettings settings { get; set; }
+
     }
 }

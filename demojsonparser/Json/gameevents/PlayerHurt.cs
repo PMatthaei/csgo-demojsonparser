@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JSON.Objects;
+using JSON.Entities;
 
 namespace JSON.Events
 {
-    class JSONPlayerHurt : JSONGameevent
+    class PlayerHurt : WeaponFire
     {
-        public JSONPlayer attacker { get; set; }
-        public JSONPlayer victim { get; set; }
+        public Player attacker { get; set; }
+        public Player victim { get; set; }
         public int HP { get; set; }
         public int armor { get; set; }
         public int armor_damage { get; set; }
         public int HP_damage { get; set; }
-        public string hitgroup { get; set; }
-        public JSONItem weapon { get; set; }
+        public int hitgroup { get; set; }
+        public Item weapon { get; set; }
     }
 }
