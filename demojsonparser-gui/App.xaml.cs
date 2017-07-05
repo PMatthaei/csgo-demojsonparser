@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace demojsonparser_gui
+namespace DemojsonparserGUI
 {
     /// <summary>
     /// Interaction logic for App.xaml

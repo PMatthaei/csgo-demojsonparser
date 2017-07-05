@@ -16,6 +16,5 @@ namespace JSON.Events
         public int armor_damage { get; set; }
         public int HP_damage { get; set; }
         public int hitgroup { get; set; }
-        public Item weapon { get; set; }
     }
 }

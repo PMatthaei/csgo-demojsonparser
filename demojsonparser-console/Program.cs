@@ -14,7 +14,6 @@ namespace demojsonparser_console
     {
         static void Main(string[] args)
         {
-
             try
             {
                 if (args[0] == "-help")

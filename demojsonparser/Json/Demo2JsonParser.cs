@@ -12,19 +12,18 @@ using JSON.Entities;
 
 namespace JSON
 {
-    class JSONParser
+    class Demo2JsonParser
     {
 
         private static StreamWriter outputStream;
 
         private JsonSerializerSettings settings;
 
-        public JSONParser(string path, JsonSerializerSettings settings)
+        public Demo2JsonParser(string path, JsonSerializerSettings settings)
         {
+            this.settings = settings;
             string outputpath = path.Replace(".dem", "") + ".json";
             outputStream = new StreamWriter(outputpath);
-
-            this.settings = settings;
 
         }
 
@@ -33,28 +32,24 @@ namespace JSON
         /// </summary>
         /// <param name="gs"></param>
         /// <param name="prettyjson"></param>
-        public void dumpJSONFile(ReplayGamestate gs, bool prettyjson)
+        internal void dumpJSONFile(ReplayGamestate gs, bool prettyjson)
         {
-            Formatting f = Formatting.None;
-            if (prettyjson)
-                f = Formatting.Indented;
-
             outputStream.Write(JsonConvert.SerializeObject(gs, settings));
         }
 
 
-        public ReplayGamestate deserializeGamestateString(string gamestatestring)
+        internal ReplayGamestate deserializeGamestateString(string gamestatestring)
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<ReplayGamestate>(gamestatestring, settings);
         }
 
 
         /// <summary>
-        /// Dumps gamestate in a string
+        /// Dumps gamestate in a string - warning! long string -
         /// </summary>
         /// <param name="gs"></param>
         /// <param name="prettyjson"></param>
-        public string dumpJSONString(ReplayGamestate gs, bool prettyjson)
+        internal string dumpJSONString(ReplayGamestate gs, bool prettyjson)
         {
             Formatting f = Formatting.None;
             if (prettyjson)
@@ -62,14 +57,14 @@ namespace JSON
             return JsonConvert.SerializeObject(gs, f);
         }
 
-        public void stopParser()
+        internal void stopParser()
         {
             outputStream.Close();
         }
 
 
 
-        public GamestateMeta assembleGamemeta(string mapname, float tickrate, IEnumerable<DemoInfo.Player> players)
+        internal GamestateMeta assembleGamemeta(string mapname, float tickrate, IEnumerable<DemoInfo.Player> players)
         {
             return new GamestateMeta
             {
@@ -249,10 +244,10 @@ namespace JSON
 
         internal TakeOverEvent assemblePlayerTakeOver(BotTakeOverEventArgs e)
         {
-            if (e.Index != null)
+            if (e.Index != null && e.Taker != null && e.Taken != null)
                 Console.WriteLine("Takeover: Taker:" + e.Taker.Name + " ID: " + e.Taker.SteamID + " Taken:" + e.Taken.Name + " ID: " + e.Taken.SteamID + " Index:" + e.Index.Name + " ID: " + e.Index.SteamID);
             else
-                Console.WriteLine("Takeover: Taker:" + e.Taker.Name + " ID: " + e.Taker.SteamID + " Taken:" + e.Taken.Name + " ID: " + e.Taken.SteamID);
+                return null;
 
             return new TakeOverEvent
             {
@@ -332,7 +327,7 @@ namespace JSON
             return player;
         }
 
-        internal Gameevent assemblePlayerJumped(PlayerJumpedEventArgs e)
+        internal PlayerMovement assemblePlayerJumped(PlayerJumpedEventArgs e)
         {
             return new PlayerMovement
             {
@@ -341,7 +336,7 @@ namespace JSON
             };
         }
 
-        internal Gameevent assemblePlayerFallen(PlayerFallEventArgs e)
+        internal PlayerMovement assemblePlayerFallen(PlayerFallEventArgs e)
         {
             return new PlayerMovement
             {
@@ -349,17 +344,17 @@ namespace JSON
                 actor = assemblePlayerDetailed(e.Fallen)
             };
         }
-        /*
-        internal Event assembleWeaponReload(WeaponReloadEventArgs we)
+        
+        internal Gameevent assembleWeaponReload(WeaponReloadEventArgs we)
         {
-            return new MovementEvents
+            return new Gameevent
             {
                 gameeventtype = "weapon_reload",
                 actor = assemblePlayerDetailed(we.Actor)
             };
-        }*/
+        }
 
-        internal Gameevent assemblePlayerStepped(PlayerSteppedEventArgs e)
+        internal PlayerMovement assemblePlayerStepped(PlayerSteppedEventArgs e)
         {
             return new PlayerMovement
             {
@@ -368,7 +363,7 @@ namespace JSON
             };
         }
 
-        /*public List<PlayerMeta> assemblePlayers(IEnumerable<DemoInfoModded.Player> ps)
+        public List<PlayerMeta> assemblePlayers(IEnumerable<DemoInfo.Player> ps)
         {
             if (ps == null)
                 return null;
@@ -377,7 +372,7 @@ namespace JSON
                 players.Add(assemblePlayerMeta(player));
 
             return players;
-        }*/
+        }
 
 
 

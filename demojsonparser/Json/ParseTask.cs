@@ -48,7 +48,9 @@ namespace JSON
         /// </summary>
         public bool highdetailplayer { get; set; }
 
-
+        /// <summary>
+        /// Serialiser Settings mainly for deserialising the file into 
+        /// </summary>
         public JsonSerializerSettings settings { get; set; }
 
     }

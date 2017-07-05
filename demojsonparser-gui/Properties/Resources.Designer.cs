@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace demojsonparser_gui.Properties
+namespace DemojsonparserGUI.Properties
 {
 
 
